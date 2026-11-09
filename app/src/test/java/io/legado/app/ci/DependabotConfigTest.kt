@@ -41,14 +41,10 @@ class DependabotConfigTest {
     }
 
     @Test
-    fun `npm updates target the Web module instead of the repository root`() {
-        val block = ecosystemBlock("npm")
-
-        assertTrue(File(repositoryRoot, "modules/web/package.json").isFile)
-        assertTrue(block.contains("directory: \"/modules/web\""))
-        assertTrue(block.contains("interval: \"weekly\""))
-        assertTrue(block.contains("day: \"monday\""))
-        assertTrue(block.contains("open-pull-requests-limit: 5"))
+    fun `removed Web module has no npm update entry`() {
+        assertFalse(File(repositoryRoot, "modules/web/package.json").exists())
+        assertFalse(configText.contains("package-ecosystem: \"npm\""))
+        assertFalse(configText.contains("/modules/web"))
     }
 
     @Test
@@ -57,7 +53,7 @@ class DependabotConfigTest {
 
         assertTrue(actionsBlock.contains("directory: \"/\""))
         assertTrue(actionsBlock.contains("day: \"monday\""))
-        assertEquals(3, "open-pull-requests-limit: 5".toRegex().findAll(configText).count())
+        assertEquals(2, "open-pull-requests-limit: 5".toRegex().findAll(configText).count())
     }
 
     private fun ecosystemBlock(ecosystem: String): String {

@@ -152,7 +152,7 @@ class PdfZoomNavigationTest {
         scenario!!.onActivity { tap(it.reader, .5f, .5f) }
         await { it.findViewById<View>(R.id.read_menu).visibility == View.VISIBLE }
         screenshot("pdf-zoom-configured-menu")
-        scenario!!.onActivity { it.findViewById<ReadMenu>(R.id.read_menu).runMenuOut(false) }
+        scenario!!.onActivity { it.findViewById<ReadMenu>(R.id.read_menu).runMenuOut() }
         // Swap the lower-right action to previous: the zoom path must use the configured value.
         scenario!!.onActivity { AppConfig.clickActionBR = 2; tap(it.reader, .85f, .85f) }
         assertEquals(initial, images())

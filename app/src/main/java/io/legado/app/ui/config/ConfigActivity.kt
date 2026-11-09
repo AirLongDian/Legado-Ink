@@ -27,7 +27,6 @@ class ConfigActivity : VMBaseActivity<ActivityConfigBinding, ConfigViewModel>() 
         when (val configTag = intent.getStringExtra("configTag")) {
             ConfigTag.MY_MORE -> replaceFragment<MyPreferenceFragment>(configTag)
             ConfigTag.OTHER_CONFIG -> replaceFragment<OtherConfigFragment>(configTag)
-            ConfigTag.THEME_CONFIG -> replaceFragment<ThemeConfigFragment>(configTag)
             ConfigTag.BACKUP_CONFIG -> replaceFragment<BackupConfigFragment>(configTag)
             ConfigTag.COVER_CONFIG -> replaceFragment<CoverConfigFragment>(configTag)
             ConfigTag.COVER_FONT_CONFIG -> replaceFragment<CoverFontConfigFragment>(configTag)

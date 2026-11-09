@@ -7,19 +7,14 @@ import java.io.File
 class ScrollReadPositionContractTest {
 
     @Test
-    fun `applying preset updates the reader before reflecting radio selection`() {
+    fun `style dialog exposes neither presets nor page animation settings`() {
         val dialog = source("app/src/main/java/io/legado/app/ui/book/read/config/ReadStyleDialog.kt")
-        val change = dialog.substringAfter("private fun changeBgTextConfig(")
-            .substringBefore("private fun showBgTextConfig")
-        val apply = change.indexOf("callBack?.upPageAnim()")
-        assertTrue(apply >= 0)
-        assertTrue(change.indexOf("upView()") > apply)
-        assertTrue(change.contains("if (ReadBook.pageAnim() != oldPageAnim) callBack?.upPageAnim()"))
-        assertTrue(dialog.contains("if (updatingPageAnim) return@setOnCheckedChangeListener"))
-        val update = dialog.substringAfter("private fun upView()")
-        assertTrue(update.indexOf("updatingPageAnim = true") >= 0)
-        assertTrue(update.indexOf("rgPageAnim.check") > update.indexOf("updatingPageAnim = true"))
-        assertTrue(update.indexOf("updatingPageAnim = false") > update.indexOf("rgPageAnim.check"))
+        val layout = source("app/src/main/res/layout/dialog_read_book_style.xml")
+        assertTrue(!dialog.contains("changeBgTextConfig"))
+        assertTrue(!dialog.contains("StyleAdapter"))
+        assertTrue(!dialog.contains("rgPageAnim"))
+        assertTrue(!layout.contains("rg_page_anim"))
+        assertTrue(!layout.contains("rv_style"))
     }
 
     @Test

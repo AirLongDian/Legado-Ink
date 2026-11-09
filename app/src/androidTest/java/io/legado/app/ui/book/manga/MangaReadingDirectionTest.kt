@@ -105,7 +105,6 @@ class MangaReadingDirectionTest {
             .putBoolean(PreferKey.disableClickScroll, false)
             .putBoolean(PreferKey.disableMangaScale, true)
             .putBoolean(PreferKey.disableHorizontalPageSnap, false)
-            .putBoolean(PreferKey.disableMangaPageAnim, false)
             .putBoolean(PreferKey.enableMangaEInk, false)
             .putBoolean(PreferKey.enableMangaGray, false)
             .putBoolean(PreferKey.enableReadRecord, false)
@@ -316,7 +315,6 @@ class MangaReadingDirectionTest {
         key(KeyEvent.KEYCODE_PAGE_UP)
         awaitPage(1, 1)
         toggle(R.id.menu_disable_horizontal_page_snap)
-        toggle(R.id.menu_disable_manga_page_anim)
         assertTrue(AppConfig.disableMangaPageAnim)
         assertLogicalKeys()
         toggle(R.id.menu_manga_right_to_left)
@@ -404,7 +402,7 @@ class MangaReadingDirectionTest {
             if (AppConfig.mangaRightToLeft != rightToLeft) {
                 toggle(R.id.menu_manga_right_to_left)
             }
-            scenario!!.onActivity { it.ui.mangaMenu.runMenuIn(false) }
+            scenario!!.onActivity { it.ui.mangaMenu.runMenuIn() }
             awaitActivity("chapter buttons placed in the selected direction") { activity ->
                 val previous = activity.findViewById<View>(R.id.tv_pre)
                 val next = activity.findViewById<View>(R.id.tv_next)
@@ -414,7 +412,7 @@ class MangaReadingDirectionTest {
             awaitPage(1, if (rightToLeft) 3 else 0)
             seekAtEdge(left = false)
             awaitPage(1, if (rightToLeft) 0 else 3)
-            scenario!!.onActivity { it.ui.mangaMenu.runMenuOut(false) }
+            scenario!!.onActivity { it.ui.mangaMenu.runMenuOut() }
         }
     }
 
@@ -560,10 +558,10 @@ class MangaReadingDirectionTest {
     private fun setAutomaticMenu(activity: ReadMangaActivity, id: Int, enabled: Boolean) {
         val item = activity.findViewById<TitleBar>(R.id.title_bar).menu.findItem(id)
         if (item.isChecked != enabled) {
-            activity.ui.mangaMenu.runMenuIn(false)
+            activity.ui.mangaMenu.runMenuIn()
             assertTrue(item.isVisible && item.isEnabled)
             activity.onCompatOptionsItemSelected(item)
-            activity.ui.mangaMenu.runMenuOut(false)
+            activity.ui.mangaMenu.runMenuOut()
         }
         assertEquals(enabled, item.isChecked)
     }
@@ -639,9 +637,9 @@ class MangaReadingDirectionTest {
 
     private fun chapterButton(id: Int) {
         scenario!!.onActivity { activity ->
-            activity.ui.mangaMenu.runMenuIn(false)
+            activity.ui.mangaMenu.runMenuIn()
             assertTrue(activity.findViewById<View>(id).performClick())
-            activity.ui.mangaMenu.runMenuOut(false)
+            activity.ui.mangaMenu.runMenuOut()
         }
     }
 

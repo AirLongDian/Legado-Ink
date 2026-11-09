@@ -24,7 +24,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -469,15 +468,7 @@ class VideoPlayerActivity : VMBaseActivity<ActivityVideoPlayerBinding, VideoPlay
     private fun scrollToDurChapter(recyclerView: RecyclerView, index: Int) {
         recyclerView.postDelayed({
             val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
-            layoutManager?.run {
-                val smoothScroller = object : LinearSmoothScroller(this@VideoPlayerActivity) {
-                    override fun getHorizontalSnapPreference(): Int {
-                        return SNAP_TO_START // 滚动到最左边
-                    }
-                }
-                smoothScroller.targetPosition = index
-                this.startSmoothScroll(smoothScroller)
-            }
+            layoutManager?.scrollToPositionWithOffset(index, 0)
             val adapter = recyclerView.adapter as? ChapterAdapter
             adapter?.updateSelectedPosition(index)
         }, 200)

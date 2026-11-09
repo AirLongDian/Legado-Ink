@@ -1,6 +1,5 @@
 package io.legado.app.service
 
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
@@ -24,13 +23,9 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.WindowManager
-import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
-import androidx.dynamicanimation.animation.FloatPropertyCompat
-import androidx.dynamicanimation.animation.SpringAnimation
-import androidx.dynamicanimation.animation.SpringForce
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.util.UnstableApi
 import com.shuyu.gsyvideoplayer.listener.GSYSampleCallBack
@@ -84,7 +79,6 @@ class VideoPlayService : BaseService() {
     private var isNew = true
     private var mediaNotificationReady = false
     private var upNotificationJob: Coroutine<*>? = null
-    private var animator: SpringAnimation? = null
     private var cover: Bitmap =
         BitmapFactory.decodeResource(appCtx.resources, R.drawable.icon_read_book)
     private var upPlayProgressJob: Job? = null
@@ -115,22 +109,6 @@ class VideoPlayService : BaseService() {
         }
     }
 
-    private fun cancelAnimator() {
-        animator?.cancel()
-    }
-
-    private val layoutParamsXProperty =
-        object : FloatPropertyCompat<WindowManager.LayoutParams>("x") {
-            override fun getValue(layoutParams: WindowManager.LayoutParams): Float {
-                return layoutParams.x.toFloat()
-            }
-
-            override fun setValue(layoutParams: WindowManager.LayoutParams, value: Float) {
-                layoutParams.x = value.toInt()
-                updateViewPosition()
-            }
-        }
-
     private fun startEdgeAnimation() {
         val displayMetrics = resources.displayMetrics
         val screenWidth = displayMetrics.widthPixels
@@ -152,22 +130,9 @@ class VideoPlayService : BaseService() {
         } else if (currentY > screenHeight - viewHeight - 60) {
             endY = screenHeight - viewHeight - 60
         }
-        if (endY != currentY) {
-            ObjectAnimator.ofInt(currentY, endY).apply {
-                duration = 200
-                interpolator = DecelerateInterpolator()
-                addUpdateListener { animation ->
-                    params.y = animation.animatedValue as Int
-                    updateViewPosition()
-                }
-                start()
-            }
-        }
-        animator = SpringAnimation(params, layoutParamsXProperty, endX.toFloat()).apply {
-            spring.stiffness = SpringForce.STIFFNESS_LOW  // 低刚度更Q弹
-            spring.dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY  // 中等阻尼
-            start()
-        }
+        params.x = endX
+        params.y = endY
+        updateViewPosition()
     }
 
     override fun onCreate() {
@@ -510,7 +475,6 @@ class VideoPlayService : BaseService() {
                     initialTouchY = event.rawY
                     initialX = params.x
                     initialY = params.y
-                    cancelAnimator()
                 }
 
                 MotionEvent.ACTION_MOVE -> {
@@ -521,7 +485,6 @@ class VideoPlayService : BaseService() {
                         params.x = (initialX + (event.rawX - initialTouchX)).toInt()
                         params.y = (initialY + (event.rawY - initialTouchY)).toInt()
                         updateViewPosition()
-                        cancelAnimator()
                     } else {
                         isClick = true
                     }

@@ -303,7 +303,7 @@ class ReadAloudMenuUiTest {
             scenario!!.onActivity {
                 assertFalse("Playback controls must remain hidden over the main menu",
                     it.findViewById<View>(R.id.read_aloud_float_bar_container).isVisible)
-                it.findViewById<ReadMenu>(R.id.read_menu).runMenuOut(anim = false)
+                it.findViewById<ReadMenu>(R.id.read_menu).runMenuOut()
             }
             await("controls return after menu closes") { it.findViewById<View>(R.id.iv_pause_aloud).isShown }
         }

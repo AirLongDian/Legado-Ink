@@ -1,6 +1,5 @@
 package io.legado.app.help.config
 
-import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Build
 import io.legado.app.BuildConfig
@@ -16,14 +15,12 @@ import io.legado.app.utils.getPrefBoolean
 import io.legado.app.utils.getPrefInt
 import io.legado.app.utils.getPrefLong
 import io.legado.app.utils.getPrefString
-import io.legado.app.utils.isNightMode
 import io.legado.app.utils.parseIpsFromString
 import io.legado.app.utils.putPrefBoolean
 import io.legado.app.utils.putPrefInt
 import io.legado.app.utils.putPrefLong
 import io.legado.app.utils.putPrefString
 import io.legado.app.utils.removePref
-import io.legado.app.utils.sysConfiguration
 import io.legado.app.utils.toastOnUi
 import splitties.init.appCtx
 import java.net.InetAddress
@@ -33,8 +30,6 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
     val paragraphReadMode get() = appCtx.getPrefBoolean(PreferKey.paragraphReadMode, false)
     val paragraphReadControls get() = appCtx.getPrefBoolean(PreferKey.paragraphReadControls, true)
     val paragraphReadProgress get() = appCtx.getPrefBoolean(PreferKey.paragraphReadProgress, true)
-    private const val JS_SOURCE_API_PREFS = "js_source_api_credentials"
-    private const val JS_SOURCE_API_TOKEN = "token"
 
     val isCronet: Boolean
         get() = appCtx.getPrefBoolean(PreferKey.cronet)
@@ -53,7 +48,7 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
     var editTheme = appCtx.getPrefInt(PreferKey.editTheme, 0)
     var editThemeDark = appCtx.getPrefInt(PreferKey.editThemeDark, 0)
     var editTemeAuto = appCtx.getPrefBoolean(PreferKey.editTemeAuto)
-    var isEInkMode = appCtx.getPrefString(PreferKey.themeMode) == "3"
+    const val isEInkMode = true
     var clickActionTL = appCtx.getPrefInt(PreferKey.clickActionTL, 2)
     var clickActionTC = appCtx.getPrefInt(PreferKey.clickActionTC, 2)
     var clickActionTR = appCtx.getPrefInt(PreferKey.clickActionTR, 1)
@@ -63,7 +58,7 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
     var clickActionBL = appCtx.getPrefInt(PreferKey.clickActionBL, 2)
     var clickActionBC = appCtx.getPrefInt(PreferKey.clickActionBC, 1)
     var clickActionBR = appCtx.getPrefInt(PreferKey.clickActionBR, 1)
-    var themeMode = appCtx.getPrefString(PreferKey.themeMode, "0")
+    const val themeMode = "3"
     var useDefaultCover = appCtx.getPrefBoolean(PreferKey.useDefaultCover, false)
     var optimizeRender = CanvasRecorderFactory.isSupport
             && appCtx.getPrefBoolean(PreferKey.optimizeRender, false)
@@ -93,14 +88,6 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
             PreferKey.cPrimary, PreferKey.cNPrimary, PreferKey.cAccent, PreferKey.cNAccent,
             PreferKey.cBackground, PreferKey.cNBackground, PreferKey.cBBackground, PreferKey.cNBBackground,
             PreferKey.bgImage, PreferKey.bgImageN -> ResourceThemeGeneration.changed()
-
-            PreferKey.themeMode -> {
-                // Each preference mutation invalidates resources, including A -> B -> A
-                // before queued preference callbacks observe the final value.
-                themeMode = appCtx.getPrefString(PreferKey.themeMode, "0")
-                isEInkMode = themeMode == "3"
-                ResourceThemeGeneration.changed()
-            }
 
             PreferKey.clickActionTL -> clickActionTL =
                 appCtx.getPrefInt(PreferKey.clickActionTL, 2)
@@ -194,21 +181,8 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
         }
 
     var isNightTheme: Boolean
-        get() = when (themeMode) {
-            "1" -> false
-            "2" -> true
-            "3" -> false
-            else -> sysConfiguration.isNightMode
-        }
-        set(value) {
-            if (isNightTheme != value) {
-                if (value) {
-                    appCtx.putPrefString(PreferKey.themeMode, "2")
-                } else {
-                    appCtx.putPrefString(PreferKey.themeMode, "1")
-                }
-            }
-        }
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) = Unit
     var showBookname: Int
         get() = appCtx.getPrefInt(PreferKey.showBooknameLayout, 0)
         set(value) {
@@ -560,38 +534,6 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
         get() = appCtx.getPrefString(PreferKey.ttsEngine)
         set(value) {
             appCtx.putPrefString(PreferKey.ttsEngine, value)
-        }
-
-    var webPort: Int
-        get() = appCtx.getPrefInt(PreferKey.webPort, 1122)
-        set(value) {
-            appCtx.putPrefInt(PreferKey.webPort, value)
-        }
-
-    var mcpPort: Int
-        get() = appCtx.getPrefInt(PreferKey.mcpPort, 1236)
-        set(value) {
-            appCtx.putPrefInt(PreferKey.mcpPort, value)
-        }
-
-    val jsSourceApiTokenRequired: Boolean
-        get() = appCtx.getPrefBoolean(PreferKey.jsSourceApiTokenRequired, true)
-
-    var jsSourceApiToken: String?
-        get() = appCtx.getSharedPreferences(JS_SOURCE_API_PREFS, MODE_PRIVATE)
-            .getString(JS_SOURCE_API_TOKEN, null)
-        set(value) {
-            val normalizedValue = normalizeJsSourceApiToken(value)
-            appCtx.getSharedPreferences(JS_SOURCE_API_PREFS, MODE_PRIVATE)
-                .edit()
-                .apply {
-                    if (normalizedValue == null) {
-                        remove(JS_SOURCE_API_TOKEN)
-                    } else {
-                        putString(JS_SOURCE_API_TOKEN, normalizedValue)
-                    }
-                }
-                .commit()
         }
 
     var tocUiUseReplace: Boolean
@@ -1007,11 +949,7 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
             appCtx.putPrefBoolean(PreferKey.mangaLongClickSaveImage, value)
         }
 
-    var disableMangaPageAnim: Boolean
-        get() = appCtx.getPrefBoolean(PreferKey.disableMangaPageAnim, false)
-        set(value) {
-            appCtx.putPrefBoolean(PreferKey.disableMangaPageAnim, value)
-        }
+    const val disableMangaPageAnim = true
 
     //漫画预加载数量
     var mangaPreDownloadNum
@@ -1129,9 +1067,5 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
         }
 
     val autoUpdateVariant get() = appCtx.getPrefBoolean("autoUpdateVariant", true)
-}
-
-internal fun normalizeJsSourceApiToken(value: String?): String? {
-    return value?.trim()?.takeIf { it.isNotEmpty() }
 }
 

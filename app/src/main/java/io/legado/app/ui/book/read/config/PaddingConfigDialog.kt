@@ -1,6 +1,5 @@
 package io.legado.app.ui.book.read.config
 
-import android.animation.ValueAnimator
 import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -40,7 +39,6 @@ class PaddingConfigDialog : BaseDialogFragment(R.layout.dialog_read_padding) {
     private var textColor = 0
     private var bgColor = 0
     private var pendingBodyEdit: PaddingEdit? = null
-    private var alphaAnimator: ValueAnimator? = null
     private val bodyThrottle = throttle<Unit>(150, leading = false) {
         val edit = pendingBodyEdit
         pendingBodyEdit = null
@@ -87,7 +85,6 @@ class PaddingConfigDialog : BaseDialogFragment(R.layout.dialog_read_padding) {
         finishPendingBodyEdit()
         activeTrackingCount = 0
         trackingRegion = null
-        alphaAnimator?.cancel()
         restoreWindowAlpha()
         super.onDestroyView()
     }
@@ -361,17 +358,9 @@ class PaddingConfigDialog : BaseDialogFragment(R.layout.dialog_read_padding) {
 
     private fun ghostWindow(ghost: Boolean) {
         val window = dialog?.window ?: return
-        alphaAnimator?.cancel()
-        alphaAnimator = ValueAnimator.ofFloat(window.attributes.alpha, if (ghost) 0.25f else 1f)
-            .apply {
-                duration = 120
-                addUpdateListener { animation ->
-                    window.attributes = window.attributes.apply {
-                        alpha = animation.animatedValue as Float
-                    }
-                }
-                start()
-            }
+        window.attributes = window.attributes.apply {
+            alpha = if (ghost) 0.25f else 1f
+        }
     }
 
     private fun restoreWindowAlpha() {

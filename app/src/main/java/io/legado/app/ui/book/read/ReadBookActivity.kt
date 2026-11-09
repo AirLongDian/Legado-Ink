@@ -96,11 +96,6 @@ import io.legado.app.ui.book.changesource.ChangeBookSourceDialog
 import io.legado.app.ui.book.changesource.ChangeChapterSourceDialog
 import io.legado.app.ui.book.info.BookInfoActivity
 import io.legado.app.ui.book.read.config.AutoReadDialog
-import io.legado.app.ui.book.read.config.BgTextConfigDialog.Companion.BG_COLOR
-import io.legado.app.ui.book.read.config.BgTextConfigDialog.Companion.REVIEW_ICON_COLOR
-import io.legado.app.ui.book.read.config.BgTextConfigDialog.Companion.TEXT_ACCENT_COLOR
-import io.legado.app.ui.book.read.config.BgTextConfigDialog.Companion.TEXT_COLOR
-import io.legado.app.ui.book.read.config.BgTextConfigDialog.Companion.UNDERLINE_COLOR
 import io.legado.app.ui.book.read.config.MoreConfigDialog
 import io.legado.app.ui.book.read.config.ReadAloudDialog
 import io.legado.app.ui.book.read.config.ReaderMenuConfigDialog
@@ -112,7 +107,6 @@ import io.legado.app.ui.book.read.config.TipConfigDialog.Companion.TIP_COLOR
 import io.legado.app.ui.book.read.config.TipConfigDialog.Companion.TIP_DIVIDER_COLOR
 import io.legado.app.ui.book.read.page.ContentTextView
 import io.legado.app.ui.book.read.page.ReadView
-import io.legado.app.ui.book.read.page.delegate.ScrollPageDelegate
 import io.legado.app.ui.book.read.page.entities.PageDirection
 import io.legado.app.ui.book.read.page.entities.TextPage
 import io.legado.app.ui.book.read.paragraph.ParagraphItem
@@ -1133,11 +1127,6 @@ class ReadBookActivity : BaseReadBookActivity(),
                 refreshContentAll(it)
             }
 
-            R.id.menu_page_anim -> showPageAnimConfig {
-                binding.readView.upPageAnim()
-                ReadBook.loadContent(false)
-            }
-
             R.id.menu_log -> showDialogFragment<AppLogDialog>()
             R.id.menu_toc_regex -> showDialogFragment(
                 TxtTocRuleDialog(ReadBook.book?.tocUrl)
@@ -1685,10 +1674,6 @@ class ReadBookActivity : BaseReadBookActivity(),
             binding.paragraphReadView.scrollByPixels(
                 -(distance * (AppConfig.mouseWheelScrollSpeed / 2f)).toInt()
             )
-        } else if (binding.readView.isScroll) {
-            // 滚动视图时滚动,否则翻页
-            val scrollDistance = (distance * (AppConfig.mouseWheelScrollSpeed / 2f)).toInt()
-            (binding.readView.pageDelegate as? ScrollPageDelegate)?.curPage?.scroll(scrollDistance)
         } else {
             keyPageDebounce(direction, mouseWheel = true, longPress = false)
         }
@@ -2830,40 +2815,6 @@ class ReadBookActivity : BaseReadBookActivity(),
      */
     override fun onColorSelected(dialogId: Int, color: Int) = ReadBookConfig.durConfig.run {
         when (dialogId) {
-            TEXT_COLOR -> {
-                setCurTextColor(color)
-                postEvent(EventBus.UP_CONFIG, arrayListOf(2, 6, 9, 11))
-                if (AppConfig.readBarStyleFollowPage) {
-                    postEvent(EventBus.UPDATE_READ_ACTION_BAR, true)
-                }
-            }
-
-            TEXT_ACCENT_COLOR -> {
-                setCurTextAccentColor(color)
-                postEvent(EventBus.UP_CONFIG, arrayListOf(2, 6, 9, 11))
-                if (AppConfig.readBarStyleFollowPage) {
-                    postEvent(EventBus.UPDATE_READ_ACTION_BAR, true)
-                }
-            }
-
-            BG_COLOR -> {
-                setCurBg(0, "#${color.hexString}")
-                postEvent(EventBus.UP_CONFIG, arrayListOf(1))
-                if (AppConfig.readBarStyleFollowPage) {
-                    postEvent(EventBus.UPDATE_READ_ACTION_BAR, true)
-                }
-            }
-
-            REVIEW_ICON_COLOR -> {
-                ReadBookConfig.reviewIconColor = color
-                postEvent(EventBus.UP_CONFIG, arrayListOf(8, 9, 11))
-            }
-
-            UNDERLINE_COLOR -> {
-                ReadBookConfig.underlineColor = color
-                postEvent(EventBus.UP_CONFIG, arrayListOf(6, 9, 11))
-            }
-
             HighlightStyleDialog.HL_FILL,
             HighlightStyleDialog.HL_TEXT,
             HighlightStyleDialog.HL_UNDERLINE,

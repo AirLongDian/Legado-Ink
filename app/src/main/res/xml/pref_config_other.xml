@@ -89,12 +89,6 @@
             android:summary="@string/custom_hosts_summary"
             android:title="@string/custom_hosts" />
 
-        <io.legado.app.lib.prefs.SwitchPreference
-            android:defaultValue="false"
-            android:key="webServiceWakeLock"
-            android:summary="@string/web_service_wake_lock_summary"
-            android:title="@string/web_service_wake_lock" />
-
         <io.legado.app.lib.prefs.Preference
             android:key="defaultBookTreeUri"
             android:summary="@string/book_tree_uri_s"
@@ -211,29 +205,6 @@
             android:key="videoSetting"
             android:summary="@string/video_setting_summary"
             android:title="@string/video_setting" />
-
-        <io.legado.app.lib.prefs.Preference
-            android:key="webPort"
-            android:title="@string/web_port_title"
-            app:iconSpaceReserved="false" />
-
-        <io.legado.app.lib.prefs.Preference
-            android:key="mcpPort"
-            android:title="@string/mcp_port_title"
-            app:iconSpaceReserved="false" />
-
-        <io.legado.app.lib.prefs.SwitchPreference
-            android:defaultValue="true"
-            android:key="jsSourceApiTokenRequired"
-            android:summary="@string/js_source_api_token_required_summary"
-            android:title="@string/js_source_api_token_required_title"
-            app:iconSpaceReserved="false" />
-
-        <io.legado.app.lib.prefs.EditTextPreference
-            android:key="jsSourceApiToken"
-            android:summary="@string/js_source_api_token_summary"
-            android:title="@string/js_source_api_token_title"
-            app:iconSpaceReserved="false" />
 
         <io.legado.app.lib.prefs.Preference
             android:key="cleanCache"

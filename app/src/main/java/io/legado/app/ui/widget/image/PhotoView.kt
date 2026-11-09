@@ -16,11 +16,7 @@ import android.view.ScaleGestureDetector.OnScaleGestureListener
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
-import android.view.animation.DecelerateInterpolator
-import android.view.animation.Interpolator
 import android.widget.ImageView
-import android.widget.OverScroller
-import android.widget.Scroller
 import androidx.appcompat.widget.AppCompatImageView
 import io.legado.app.ui.widget.image.photo.Info
 import io.legado.app.ui.widget.image.photo.OnRotateListener
@@ -45,11 +41,9 @@ class PhotoView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : AppCompatImageView(context, attrs) {
     val MIN_ROTATE = 35
-    val ANIMA_DURING = 340
     val MAX_SCALE = 2.5f
 
     private var mMinRotate = 0
-    var mAnimaDuring = 0
     private var mMaxScale = 0f
 
     var MAX_OVER_SCROLL = 0
@@ -131,15 +125,7 @@ class PhotoView @JvmOverloads constructor(
         MAX_FLING_OVER_SCROLL = (density * 30).toInt()
         MAX_OVER_RESISTANCE = (density * 140).toInt()
         mMinRotate = MIN_ROTATE
-        mAnimaDuring = ANIMA_DURING
         mMaxScale = MAX_SCALE
-    }
-
-    /**
-     * 获取默认的动画持续时间
-     */
-    fun getDefaultAnimDuring(): Int {
-        return ANIMA_DURING
     }
 
     override fun setScaleType(scaleType: ScaleType) {
@@ -156,26 +142,6 @@ class PhotoView @JvmOverloads constructor(
         mLongClick = l
     }
 
-    /**
-     * 设置动画的插入器
-     */
-    fun setInterpolator(interpolator: Interpolator?) {
-        mTranslate.setInterpolator(interpolator)
-    }
-
-    /**
-     * 获取动画持续时间
-     */
-    fun getAnimDuring(): Int {
-        return mAnimaDuring
-    }
-
-    /**
-     * 设置动画的持续时间
-     */
-    fun setAnimDuring(during: Int) {
-        mAnimaDuring = during
-    }
 
     /**
      * 设置最大可以缩放的倍数
@@ -556,7 +522,6 @@ class PhotoView @JvmOverloads constructor(
             }
         }
         if (tx != 0 || ty != 0) {
-            if (!mTranslate.mFlingScroller.isFinished) mTranslate.mFlingScroller.abortAnimation()
             mTranslate.withTranslate(mTranslateX, mTranslateY, -tx, -ty)
         }
     }
@@ -632,65 +597,17 @@ class PhotoView @JvmOverloads constructor(
         return if (hasMultiTouch) true else canScrollVerticallySelf(direction.toFloat())
     }
 
-    private inner class InterpolatorProxy : Interpolator {
-        private var mTarget: Interpolator?
-
-        init {
-            mTarget = DecelerateInterpolator()
-        }
-
-        fun setTargetInterpolator(interpolator: Interpolator?) {
-            mTarget = interpolator
-        }
-
-        override fun getInterpolation(input: Float): Float {
-            return mTarget?.getInterpolation(input) ?: input
-        }
-
-    }
-
-    private inner class Transform : Runnable {
+    private inner class Transform {
         var isRunning = false
-        var mTranslateScroller: OverScroller
-        var mFlingScroller: OverScroller
-        var mScaleScroller: Scroller
-        var mClipScroller: Scroller
-        var mRotateScroller: Scroller
-        var c: ClipCalculate? = null
-        var mLastFlingX = 0
-        var mLastFlingY = 0
-        var mLastTranslateX = 0
-        var mLastTranslateY = 0
         var mClipRect = RectF()
-        var mInterpolatorProxy = InterpolatorProxy()
-
-        fun setInterpolator(interpolator: Interpolator?) {
-            mInterpolatorProxy.setTargetInterpolator(interpolator)
-        }
-
-        init {
-            val ctx: Context = context
-            mTranslateScroller = OverScroller(ctx, mInterpolatorProxy)
-            mScaleScroller = Scroller(ctx, mInterpolatorProxy)
-            mFlingScroller = OverScroller(ctx, mInterpolatorProxy)
-            mClipScroller = Scroller(ctx, mInterpolatorProxy)
-            mRotateScroller = Scroller(ctx, mInterpolatorProxy)
-        }
 
         fun withTranslate(startX: Int, startY: Int, deltaX: Int, deltaY: Int) {
-            mLastTranslateX = 0
-            mLastTranslateY = 0
-            mTranslateScroller.startScroll(0, 0, deltaX, deltaY, mAnimaDuring)
+            mTranslateX += deltaX
+            mTranslateY += deltaY
         }
 
         fun withScale(form: Float, to: Float) {
-            mScaleScroller.startScroll(
-                (form * 10000).toInt(),
-                0,
-                ((to - form) * 10000).toInt(),
-                0,
-                mAnimaDuring
-            )
+            mScale = to
         }
 
         fun withClip(
@@ -701,158 +618,69 @@ class PhotoView @JvmOverloads constructor(
             d: Int,
             c: ClipCalculate?
         ) {
-            mClipScroller.startScroll(
-                (fromX * 10000).toInt(),
-                (fromY * 10000).toInt(),
-                (deltaX * 10000).toInt(),
-                (deltaY * 10000).toInt(),
-                d
+            val sx = fromX + deltaX
+            val sy = fromY + deltaY
+            mTmpMatrix.setScale(
+                sx,
+                sy,
+                (mImgRect.left + mImgRect.right) / 2,
+                c?.calculateTop() ?: mImgRect.centerY()
             )
-            this.c = c
+            mTmpMatrix.mapRect(mClipRect, mImgRect)
+            if (sx == 1f) {
+                mClipRect.left = mWidgetRect.left
+                mClipRect.right = mWidgetRect.right
+            }
+            if (sy == 1f) {
+                mClipRect.top = mWidgetRect.top
+                mClipRect.bottom = mWidgetRect.bottom
+            }
+            mClip = mClipRect
         }
 
         fun withRotate(fromDegrees: Int, toDegrees: Int) {
-            mRotateScroller.startScroll(fromDegrees, 0, toDegrees - fromDegrees, 0, mAnimaDuring)
+            mDegrees = toDegrees.toFloat()
         }
 
         fun withRotate(fromDegrees: Int, toDegrees: Int, during: Int) {
-            mRotateScroller.startScroll(fromDegrees, 0, toDegrees - fromDegrees, 0, during)
+            mDegrees = toDegrees.toFloat()
         }
 
-        fun withFling(velocityX: Float, velocityY: Float) {
-            mLastFlingX = if (velocityX < 0) Int.MAX_VALUE else 0
-            var distanceX =
-                (if (velocityX > 0) abs(mImgRect.left) else mImgRect.right - mWidgetRect.right).toInt()
-            distanceX = if (velocityX < 0) Int.MAX_VALUE - distanceX else distanceX
-            var minX = if (velocityX < 0) distanceX else 0
-            var maxX = if (velocityX < 0) Int.MAX_VALUE else distanceX
-            val overX = if (velocityX < 0) Int.MAX_VALUE - minX else distanceX
-            mLastFlingY = if (velocityY < 0) Int.MAX_VALUE else 0
-            var distanceY =
-                (if (velocityY > 0) abs(mImgRect.top) else mImgRect.bottom - mWidgetRect.bottom).toInt()
-            distanceY = if (velocityY < 0) Int.MAX_VALUE - distanceY else distanceY
-            var minY = if (velocityY < 0) distanceY else 0
-            var maxY = if (velocityY < 0) Int.MAX_VALUE else distanceY
-            val overY = if (velocityY < 0) Int.MAX_VALUE - minY else distanceY
-            if (velocityX == 0f) {
-                maxX = 0
-                minX = 0
-            }
-            if (velocityY == 0f) {
-                maxY = 0
-                minY = 0
-            }
-            mFlingScroller.fling(
-                mLastFlingX,
-                mLastFlingY,
-                velocityX.toInt(),
-                velocityY.toInt(),
-                minX,
-                maxX,
-                minY,
-                maxY,
-                if (abs(overX) < MAX_FLING_OVER_SCROLL * 2) 0 else MAX_FLING_OVER_SCROLL,
-                if (abs(overY) < MAX_FLING_OVER_SCROLL * 2) 0 else MAX_FLING_OVER_SCROLL
-            )
-        }
+        fun withFling(velocityX: Float, velocityY: Float) = Unit
 
         fun start() {
             isRunning = true
-            postExecute()
+            applyAnima()
+            finish()
         }
 
         fun stop() {
-            removeCallbacks(this)
-            mTranslateScroller.abortAnimation()
-            mScaleScroller.abortAnimation()
-            mFlingScroller.abortAnimation()
-            mRotateScroller.abortAnimation()
             isRunning = false
         }
 
-        override fun run() {
-
-            // if (!isRuning) return;
-            var endAnima = true
-            if (mScaleScroller.computeScrollOffset()) {
-                mScale = mScaleScroller.currX / 10000f
-                endAnima = false
-            }
-            if (mTranslateScroller.computeScrollOffset()) {
-                val tx = mTranslateScroller.currX - mLastTranslateX
-                val ty = mTranslateScroller.currY - mLastTranslateY
-                mTranslateX += tx
-                mTranslateY += ty
-                mLastTranslateX = mTranslateScroller.currX
-                mLastTranslateY = mTranslateScroller.currY
-                endAnima = false
-            }
-            if (mFlingScroller.computeScrollOffset()) {
-                val x = mFlingScroller.currX - mLastFlingX
-                val y = mFlingScroller.currY - mLastFlingY
-                mLastFlingX = mFlingScroller.currX
-                mLastFlingY = mFlingScroller.currY
-                mTranslateX += x
-                mTranslateY += y
-                endAnima = false
-            }
-            if (mRotateScroller.computeScrollOffset()) {
-                mDegrees = mRotateScroller.currX.toFloat()
-                endAnima = false
-            }
-            if (mClipScroller.computeScrollOffset() || mClip != null) {
-                val sx = mClipScroller.currX / 10000f
-                val sy = mClipScroller.currY / 10000f
-                mTmpMatrix.setScale(
-                    sx,
-                    sy,
-                    (mImgRect.left + mImgRect.right) / 2,
-                    c!!.calculateTop()
-                )
-                mTmpMatrix.mapRect(mClipRect, mImgRect)
-                if (sx == 1f) {
-                    mClipRect.left = mWidgetRect.left
-                    mClipRect.right = mWidgetRect.right
+        private fun finish() {
+            isRunning = false
+            var needFix = false
+            if (imgLargeWidth) {
+                if (mImgRect.left > 0) {
+                    mTranslateX -= mImgRect.left.toInt()
+                } else if (mImgRect.right < mWidgetRect.width()) {
+                    mTranslateX -= (mWidgetRect.width() - mImgRect.right).toInt()
                 }
-                if (sy == 1f) {
-                    mClipRect.top = mWidgetRect.top
-                    mClipRect.bottom = mWidgetRect.bottom
-                }
-                mClip = mClipRect
+                needFix = true
             }
-            if (!endAnima) {
-                applyAnima()
-                postExecute()
-            } else {
-                isRunning = false
-
-                // 修复动画结束后边距有些空隙，
-                var needFix = false
-                if (imgLargeWidth) {
-                    if (mImgRect.left > 0) {
-                        mTranslateX -= mImgRect.left.toInt()
-                    } else if (mImgRect.right < mWidgetRect.width()) {
-                        mTranslateX -= (mWidgetRect.width() - mImgRect.right).toInt()
-                    }
-                    needFix = true
+            if (imgLargeHeight) {
+                if (mImgRect.top > 0) {
+                    mTranslateY -= mImgRect.top.toInt()
+                } else if (mImgRect.bottom < mWidgetRect.height()) {
+                    mTranslateY -= (mWidgetRect.height() - mImgRect.bottom).toInt()
                 }
-                if (imgLargeHeight) {
-                    if (mImgRect.top > 0) {
-                        mTranslateY -= mImgRect.top.toInt()
-                    } else if (mImgRect.bottom < mWidgetRect.height()) {
-                        mTranslateY -= (mWidgetRect.height() - mImgRect.bottom).toInt()
-                    }
-                    needFix = true
-                }
-                if (needFix) {
-                    applyAnima()
-                }
-                invalidate()
-                mCompleteCallBack?.let {
-                    it.run()
-                    mCompleteCallBack = null
-                }
+                needFix = true
             }
+            if (needFix) applyAnima()
+            invalidate()
+            mCompleteCallBack?.run()
+            mCompleteCallBack = null
         }
 
         private fun applyAnima() {
@@ -864,10 +692,6 @@ class PhotoView @JvmOverloads constructor(
             mAnimMatrix.postScale(mScale, mScale, mScaleCenter.x, mScaleCenter.y)
             mAnimMatrix.postTranslate(mTranslateX.toFloat(), mTranslateY.toFloat())
             executeTranslate()
-        }
-
-        private fun postExecute() {
-            if (isRunning) post(this)
         }
 
     }
@@ -1006,7 +830,7 @@ class PhotoView @JvmOverloads constructor(
                 clipY = if (clipY > 1) 1F else clipY
                 val c =
                     if (info.mScaleType == ScaleType.FIT_START) START() else if (info.mScaleType == ScaleType.FIT_END) END() else OTHER()
-                mTranslate.withClip(clipX, clipY, 1 - clipX, 1 - clipY, mAnimaDuring / 3, c)
+                mTranslate.withClip(clipX, clipY, 1 - clipX, 1 - clipY, 0, c)
                 mTmpMatrix.setScale(
                     clipX,
                     clipY,
@@ -1055,7 +879,7 @@ class PhotoView @JvmOverloads constructor(
                 (tcy - mScaleCenter.y).toInt()
             )
             mTranslate.withScale(mScale, scale)
-            mTranslate.withRotate(mDegrees.toInt(), info.mDegrees.toInt(), mAnimaDuring * 2 / 3)
+            mTranslate.withRotate(mDegrees.toInt(), info.mDegrees.toInt(), 0)
             if (info.mWidgetRect.width() < info.mRect.width() || info.mWidgetRect.height() < info.mRect.height()) {
                 var clipX = info.mWidgetRect.width() / info.mRect.width()
                 var clipY = info.mWidgetRect.height() / info.mRect.height()
@@ -1065,10 +889,7 @@ class PhotoView @JvmOverloads constructor(
                 val cy = clipY
                 val c =
                     if (info.mScaleType == ScaleType.FIT_START) START() else if (info.mScaleType == ScaleType.FIT_END) END() else OTHER()
-                postDelayed(
-                    { mTranslate.withClip(1F, 1F, -1 + cx, -1 + cy, mAnimaDuring / 2, c) },
-                    mAnimaDuring / 2.toLong()
-                )
+                mTranslate.withClip(1F, 1F, -1 + cx, -1 + cy, 0, c)
             }
             mCompleteCallBack = completeCallBack
             mTranslate.start()

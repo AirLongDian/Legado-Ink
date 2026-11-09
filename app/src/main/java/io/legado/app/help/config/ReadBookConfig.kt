@@ -206,10 +206,11 @@ object ReadBookConfig {
     }
 
     var durConfig
-        get() = getConfig(styleSelect)
+        get() = getConfig(0)
         set(value) {
-            val changed = getConfig(styleSelect) != value
-            configList[styleSelect] = value
+            val normalized = value.applyInkDefaults()
+            val changed = getConfig(0) != normalized
+            configList[0] = normalized
             underlineConfigInitialized = false
             if (shareLayout) {
                 shareConfig = value
@@ -231,10 +232,10 @@ object ReadBookConfig {
 
     @Synchronized
     fun getConfig(index: Int): Config {
-        if (configList.size < 5) {
+        if (configList.isEmpty()) {
             resetAll()
         }
-        return configList.getOrNull(index) ?: configList[0]
+        return configList[0]
     }
 
     fun initConfigs() {
@@ -253,10 +254,11 @@ object ReadBookConfig {
                 AppLog.put("读取排版配置文件出错", e)
             }
         }
-        (configs ?: DefaultData.readConfigs).let {
-            configList.clear()
-            configList.addAll(it)
-        }
+        val config = configs?.firstOrNull()
+            ?: DefaultData.readConfigs.firstOrNull()
+            ?: Config()
+        configList.clear()
+        configList.add(config.applyInkDefaults())
         if (previous.isNotEmpty() && previous != configList) ResourceThemeGeneration.changed()
     }
 
@@ -275,7 +277,7 @@ object ReadBookConfig {
                 e.printOnDebug()
             }
         }
-        shareConfig = c ?: configList.getOrNull(5) ?: Config()
+        shareConfig = (c ?: configList.firstOrNull() ?: Config()).applyInkDefaults()
         if (previous != null && previous != shareConfig) ResourceThemeGeneration.changed()
         if (normalizeUnderline) normalizeUnderlineConfig()
     }
@@ -375,12 +377,11 @@ object ReadBookConfig {
 
     private fun resetAll() {
         val previous = configList.toList()
-        DefaultData.readConfigs.let {
-            configList.clear()
-            configList.addAll(it)
-            if (previous.isNotEmpty() && previous != configList) ResourceThemeGeneration.changed()
-            save()
-        }
+        val config = (DefaultData.readConfigs.firstOrNull() ?: Config()).applyInkDefaults()
+        configList.clear()
+        configList.add(config)
+        if (previous.isNotEmpty() && previous != configList) ResourceThemeGeneration.changed()
+        save()
     }
 
     //配置写入读取
@@ -391,39 +392,17 @@ object ReadBookConfig {
             appCtx.putPrefInt(PreferKey.autoReadSpeed, value)
         }
     var styleSelect: Int
-        get() = if (isComic) comicStyleSelect else readStyleSelect
-        set(value) {
-            if (isComic) {
-                comicStyleSelect = value
-            } else {
-                readStyleSelect = value
-            }
-        }
-    var readStyleSelect = appCtx.getPrefInt(PreferKey.readStyleSelect)
-        set(value) {
-            val changed = field != value
-            field = value
-            if (changed) ResourceThemeGeneration.changed()
-            if (appCtx.getPrefInt(PreferKey.readStyleSelect) != value) {
-                appCtx.putPrefInt(PreferKey.readStyleSelect, value)
-            }
-        }
-    var comicStyleSelect = appCtx.getPrefInt(PreferKey.comicStyleSelect, readStyleSelect)
-        set(value) {
-            val changed = field != value
-            field = value
-            if (changed) ResourceThemeGeneration.changed()
-            if (appCtx.getPrefInt(PreferKey.comicStyleSelect) != value) {
-                appCtx.putPrefInt(PreferKey.comicStyleSelect, value)
-            }
-        }
-    var shareLayout = appCtx.getPrefBoolean(PreferKey.shareLayout)
-        set(value) {
-            field = value
-            if (appCtx.getPrefBoolean(PreferKey.shareLayout) != value) {
-                appCtx.putPrefBoolean(PreferKey.shareLayout, value)
-            }
-        }
+        get() = 0
+        set(@Suppress("UNUSED_PARAMETER") value) = Unit
+    var readStyleSelect: Int
+        get() = 0
+        set(@Suppress("UNUSED_PARAMETER") value) = Unit
+    var comicStyleSelect: Int
+        get() = 0
+        set(@Suppress("UNUSED_PARAMETER") value) = Unit
+    var shareLayout: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) = Unit
 
     /**
      * 两端对齐
@@ -452,7 +431,7 @@ object ReadBookConfig {
     var hideNavigationBar = appCtx.getPrefBoolean(PreferKey.hideNavigationBar)
     var useZhLayout = appCtx.getPrefBoolean(PreferKey.useZhLayout)
 
-    val config get() = if (shareLayout) shareConfig else durConfig
+    val config get() = durConfig
 
     var bgAlpha: Int
         get() = config.bgAlpha
@@ -461,10 +440,8 @@ object ReadBookConfig {
         }
 
     var pageAnim: Int
-        get() = config.curPageAnim()
-        set(@PageAnim.Anim value) {
-            config.setCurPageAnim(value)
-        }
+        get() = PageAnim.noAnim
+        set(@Suppress("UNUSED_PARAMETER") @PageAnim.Anim value) = Unit
 
     var textFont: String
         get() = config.textFont
@@ -989,6 +966,21 @@ object ReadBookConfig {
         var footerMode: Int = 0
     ) {
 
+        fun applyInkDefaults(): Config = apply {
+            name = "墨水屏"
+            bgStrEInk = "#FFFFFF"
+            bgTypeEInk = 0
+            darkStatusIconEInk = true
+            textColorEInk = "#000000"
+            textAccentColorEInk = "#000000"
+            pageAnimEInk = PageAnim.noAnim
+            titleColor = 0
+            titleNumberColor = 0
+            tipColor = 0
+            initColorInt = false
+            initAccentColorInt = false
+        }
+
         @Transient
         private var textColorIntEInk = -1
 
@@ -1027,135 +1019,47 @@ object ReadBookConfig {
             initAccentColorInt = true
         }
 
-        fun setCurTextColor(color: Int) {
-            val changed = curTextColor() != color
-            when {
-                AppConfig.isEInkMode -> {
-                    textColorEInk = "#${color.hexString}"
-                    textColorIntEInk = color
-                }
-
-                AppConfig.isNightTheme -> {
-                    textColorNight = "#${color.hexString}"
-                    textColorIntNight = color
-                }
-
-                else -> {
-                    textColor = "#${color.hexString}"
-                    textColorInt = color
-                }
-            }
-            if (changed && configList.any { it === this }) ResourceThemeGeneration.changed()
-        }
+        fun setCurTextColor(@Suppress("UNUSED_PARAMETER") color: Int) = Unit
 
         fun curTextColor(): Int {
             if (!initColorInt) {
                 initColorInt()
             }
-            return when {
-                AppConfig.isEInkMode -> textColorIntEInk
-                AppConfig.isNightTheme -> textColorIntNight
-                else -> textColorInt
-            }
+            return textColorIntEInk
         }
 
-        fun setCurTextAccentColor(color: Int) {
-            val changed = curTextAccentColor() != color
-            when {
-                AppConfig.isEInkMode -> {
-                    textAccentColorEInk = "#${color.hexString}"
-                    textAccentColorIntEInk = color
-                }
-
-                AppConfig.isNightTheme -> {
-                    textAccentColorNight = "#${color.hexString}"
-                    textAccentColorIntNight = color
-                }
-
-                else -> {
-                    textAccentColor = "#${color.hexString}"
-                    textAccentColorInt = color
-                }
-            }
-            if (changed && configList.any { it === this }) ResourceThemeGeneration.changed()
-        }
+        fun setCurTextAccentColor(@Suppress("UNUSED_PARAMETER") color: Int) = Unit
 
         fun curTextAccentColor(): Int {
             if (!initAccentColorInt) {
                 initAccentColorInt()
             }
-            return when {
-                AppConfig.isEInkMode -> textAccentColorIntEInk
-                AppConfig.isNightTheme -> textAccentColorIntNight
-                else -> textAccentColorInt
-            }
+            return textAccentColorIntEInk
         }
 
-        fun setCurStatusIconDark(isDark: Boolean) {
-            when {
-                AppConfig.isEInkMode -> darkStatusIconEInk = isDark
-                AppConfig.isNightTheme -> darkStatusIconNight = isDark
-                else -> darkStatusIcon = isDark
-            }
-        }
+        fun setCurStatusIconDark(@Suppress("UNUSED_PARAMETER") isDark: Boolean) = Unit
 
         fun curStatusIconDark(): Boolean {
-            return when {
-                AppConfig.isEInkMode -> darkStatusIconEInk
-                AppConfig.isNightTheme -> darkStatusIconNight
-                else -> darkStatusIcon
-            }
+            return true
         }
 
-        fun setCurPageAnim(@PageAnim.Anim anim: Int) {
-            when {
-                AppConfig.isEInkMode -> pageAnimEInk = anim
-                else -> pageAnim = anim
-            }
-        }
+        fun setCurPageAnim(@Suppress("UNUSED_PARAMETER") @PageAnim.Anim anim: Int) = Unit
 
         fun curPageAnim(): Int {
-            return when {
-                AppConfig.isEInkMode -> pageAnimEInk
-                else -> pageAnim
-            }
+            return PageAnim.noAnim
         }
 
-        fun setCurBg(bgType: Int, bg: String) {
-            val changed = curBgType() != bgType || curBgStr() != bg
-            when {
-                AppConfig.isEInkMode -> {
-                    bgTypeEInk = bgType
-                    bgStrEInk = bg
-                }
-
-                AppConfig.isNightTheme -> {
-                    bgTypeNight = bgType
-                    bgStrNight = bg
-                }
-
-                else -> {
-                    this.bgType = bgType
-                    bgStr = bg
-                }
-            }
-            if (changed && configList.any { it === this }) ResourceThemeGeneration.changed()
-        }
+        fun setCurBg(
+            @Suppress("UNUSED_PARAMETER") bgType: Int,
+            @Suppress("UNUSED_PARAMETER") bg: String,
+        ) = Unit
 
         fun curBgStr(): String {
-            return when {
-                AppConfig.isEInkMode -> bgStrEInk
-                AppConfig.isNightTheme -> bgStrNight
-                else -> bgStr
-            }
+            return "#FFFFFF"
         }
 
         fun curBgType(): Int {
-            return when {
-                AppConfig.isEInkMode -> bgTypeEInk
-                AppConfig.isNightTheme -> bgTypeNight
-                else -> bgType
-            }
+            return 0
         }
 
         fun curBgDrawable(width: Int, height: Int): Drawable {

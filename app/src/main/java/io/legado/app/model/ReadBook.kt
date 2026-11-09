@@ -5,6 +5,7 @@ import io.legado.app.BuildConfig
 import io.legado.app.constant.AppConst
 import io.legado.app.constant.AppLog
 import io.legado.app.constant.EventBus
+import io.legado.app.constant.PageAnim
 import io.legado.app.constant.PageAnim.scrollPageAnim
 import io.legado.app.constant.PreferKey
 import io.legado.app.data.appDb
@@ -1845,7 +1846,7 @@ object ReadBook : CoroutineScope by MainScope() {
     }
 
     fun pageAnim(): Int {
-        return book?.getPageAnim() ?: ReadBookConfig.pageAnim
+        return PageAnim.noAnim
     }
 
     fun setCharset(charset: String) {

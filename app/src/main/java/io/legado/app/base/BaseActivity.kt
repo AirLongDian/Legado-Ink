@@ -195,22 +195,8 @@ abstract class BaseActivity<VB : ViewBinding>(
     open fun initTheme() {
         when (theme) {
             Theme.Transparent -> setTheme(R.style.AppTheme_Transparent)
-            Theme.Dark -> {
-                setTheme(R.style.AppTheme_Dark)
-                applyWindowBackground()
-            }
-
-            Theme.Light -> {
-                setTheme(R.style.AppTheme_Light)
-                applyWindowBackground()
-            }
-
             else -> {
-                if (ColorUtils.isColorLight(primaryColor)) {
-                    setTheme(R.style.AppTheme_Light)
-                } else {
-                    setTheme(R.style.AppTheme_Dark)
-                }
+                setTheme(R.style.AppTheme_EInk)
                 applyWindowBackground()
             }
         }

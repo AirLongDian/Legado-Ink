@@ -32,8 +32,6 @@ quickChineseTransfer = "0.2.17"
 
 splitties = "3.0.0"
 desugar = "2.1.5"
-mcpSdk = "0.15.0"
-ktor = "3.6.0"
 
 #kotlinxSerialization = "1.8.0"
 swiperefreshlayout = "1.2.0"
@@ -140,9 +138,8 @@ markwon-image-glide = { module = "io.noties.markwon:image-glide", version.ref = 
 markwon-ext-tables = { module = "io.noties.markwon:ext-tables", version.ref = "markwon" }
 markwon-html = { module = "io.noties.markwon:html", version.ref = "markwon" }
 
-
 nanohttpd-nanohttpd = { module = "org.nanohttpd:nanohttpd", version.ref = "nanoHttpd" }
-nanohttpd-websocket = { module = "org.nanohttpd:nanohttpd-websocket", version.ref = "nanoHttpd" }
+
 
 
 preference-preference = { module = "androidx.preference:preference", version.ref = "preference" }
@@ -211,9 +208,6 @@ htmlunit-core-js = { module = "org.htmlunit:htmlunit-core-js", version.ref = "ht
 
 renderscript-intrinsics-replacement-toolkit = { module = "com.github.TomasValenta:renderscript-intrinsics-replacement-toolkit", version = "8eaa829ddd" }
 zxing-lite = { module = "com.github.jenly1314:zxing-lite", version.ref = "zxingLite" }
-mcp-sdk-server = { module = "io.modelcontextprotocol:kotlin-sdk-server", version.ref = "mcpSdk" }
-ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
-ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
 
 [bundles]
 coroutines = ["kotlinx-coroutines-core", "kotlinx-coroutines-android"]

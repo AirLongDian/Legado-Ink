@@ -15,9 +15,7 @@ import io.legado.app.help.config.ReadBookConfig
 import io.legado.app.lib.theme.bottomBackground
 import io.legado.app.lib.theme.getPrimaryTextColor
 import io.legado.app.model.ReadAloud
-import io.legado.app.model.ReadBook
 import io.legado.app.service.BaseReadAloudService
-import io.legado.app.ui.book.read.BaseReadBookActivity
 import io.legado.app.ui.book.read.ReadBookActivity
 import io.legado.app.ui.widget.seekbar.SeekBarChangeListener
 import io.legado.app.utils.ColorUtils
@@ -67,8 +65,6 @@ class AutoReadDialog : BaseDialogFragment(R.layout.dialog_auto_read) {
         tvMainMenu.setTextColor(textColor)
         ivAutoPageStop.setColorFilter(textColor, PorterDuff.Mode.SRC_IN)
         tvAutoPageStop.setTextColor(textColor)
-        ivSetting.setColorFilter(textColor, PorterDuff.Mode.SRC_IN)
-        tvSetting.setTextColor(textColor)
         initOnChange()
         initData()
         initEvent()
@@ -99,12 +95,6 @@ class AutoReadDialog : BaseDialogFragment(R.layout.dialog_auto_read) {
         binding.llMainMenu.setOnClickListener {
             callBack?.showMenuBar()
             dismissAllowingStateLoss()
-        }
-        binding.llSetting.setOnClickListener {
-            (activity as BaseReadBookActivity).showPageAnimConfig {
-                (activity as ReadBookActivity).upPageAnim()
-                ReadBook.loadContent(false)
-            }
         }
         binding.llCatalog.setOnClickListener { callBack?.openChapterList() }
         binding.llAutoPageStop.setOnClickListener {

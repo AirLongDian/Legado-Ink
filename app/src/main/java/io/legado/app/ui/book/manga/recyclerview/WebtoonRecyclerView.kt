@@ -1,15 +1,11 @@
 package io.legado.app.ui.book.manga.recyclerview
 
-import android.animation.AnimatorSet
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.ViewConfiguration
-import android.view.animation.DecelerateInterpolator
-import androidx.core.animation.doOnEnd
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.legado.app.utils.findCenterViewPosition
@@ -125,71 +121,32 @@ class WebtoonRecyclerView @JvmOverloads constructor(
         return positionY.coerceIn(-maxPositionY, maxPositionY)
     }
 
-    private fun zoom(
-        fromRate: Float,
-        toRate: Float,
-        fromX: Float,
-        toX: Float,
-        fromY: Float,
-        toY: Float,
-    ) {
-        isZooming = true
-        val animatorSet = AnimatorSet()
-        val translationXAnimator = ValueAnimator.ofFloat(fromX, toX)
-        translationXAnimator.addUpdateListener { animation -> x = animation.animatedValue as Float }
-
-        val translationYAnimator = ValueAnimator.ofFloat(fromY, toY)
-        translationYAnimator.addUpdateListener { animation -> y = animation.animatedValue as Float }
-
-        val scaleAnimator = ValueAnimator.ofFloat(fromRate, toRate)
-        scaleAnimator.addUpdateListener { animation ->
-            currentScale = animation.animatedValue as Float
-            setScaleRate(currentScale)
-        }
-        animatorSet.playTogether(translationXAnimator, translationYAnimator, scaleAnimator)
-        animatorSet.duration = ANIMATOR_DURATION_TIME.toLong()
-        animatorSet.interpolator = DecelerateInterpolator()
-        animatorSet.start()
-        animatorSet.doOnEnd {
-            isZooming = false
-            currentScale = toRate
-        }
+    private fun zoom(toRate: Float, toX: Float, toY: Float) {
+        currentScale = toRate
+        setScaleRate(currentScale)
+        x = getPositionX(toX)
+        y = getPositionY(toY)
+        isZooming = false
     }
 
     fun zoomFling(velocityX: Int, velocityY: Int): Boolean {
         if (currentScale <= 1f) return false
 
         val distanceTimeFactor = 0.4f
-        val animatorSet = AnimatorSet()
-
         if (velocityX != 0) {
             val dx = (distanceTimeFactor * velocityX / 2)
-            val newX = getPositionX(x + dx)
-            val translationXAnimator = ValueAnimator.ofFloat(x, newX)
-            translationXAnimator.addUpdateListener { animation ->
-                x = getPositionX(animation.animatedValue as Float)
-            }
-            animatorSet.play(translationXAnimator)
+            x = getPositionX(x + dx)
         }
         if (velocityY != 0 && (atFirstPosition || atLastPosition)) {
             val dy = (distanceTimeFactor * velocityY / 2)
-            val newY = getPositionY(y + dy)
-            val translationYAnimator = ValueAnimator.ofFloat(y, newY)
-            translationYAnimator.addUpdateListener { animation ->
-                y = getPositionY(animation.animatedValue as Float)
-            }
-            animatorSet.play(translationYAnimator)
+            y = getPositionY(y + dy)
         }
-
-        animatorSet.duration = 400
-        animatorSet.interpolator = DecelerateInterpolator()
-        animatorSet.start()
 
         return true
     }
 
     fun resetZoom() {
-        zoom(currentScale, DEFAULT_RATE, x, 0f, y, 0f)
+        zoom(DEFAULT_RATE, 0f, 0f)
     }
 
     private fun zoomScrollBy(dx: Int, dy: Int) {
@@ -241,7 +198,7 @@ class WebtoonRecyclerView @JvmOverloads constructor(
 
     fun onScaleEnd() {
         if (scaleX < MIN_RATE) {
-            zoom(currentScale, MIN_RATE, x, 0f, y, 0f)
+            zoom(MIN_RATE, 0f, 0f)
         }
     }
 
@@ -260,12 +217,12 @@ class WebtoonRecyclerView @JvmOverloads constructor(
         fun onDoubleTapConfirmed(ev: MotionEvent) {
             if (!isZooming && doubleTapZoom) {
                 if (scaleX != DEFAULT_RATE) {
-                    zoom(currentScale, DEFAULT_RATE, x, 0f, y, 0f)
+                    zoom(DEFAULT_RATE, 0f, 0f)
                 } else {
                     val toScale = 2f
                     val toX = (halfWidth - ev.x) * (toScale - 1)
                     val toY = (halfHeight - ev.y) * (toScale - 1)
-                    zoom(DEFAULT_RATE, toScale, 0f, toX, 0f, toY)
+                    zoom(toScale, toX, toY)
                 }
             }
         }
@@ -383,7 +340,6 @@ class WebtoonRecyclerView @JvmOverloads constructor(
     }
 }
 
-private const val ANIMATOR_DURATION_TIME = 200
 private const val MIN_RATE = 0.5f
 private const val DEFAULT_RATE = 1f
 private const val MAX_SCALE_RATE = 3f

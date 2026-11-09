@@ -7,12 +7,10 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
-import android.text.InputType
 import android.view.View
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.postDelayed
 import androidx.fragment.app.activityViewModels
-import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -24,7 +22,6 @@ import io.legado.app.databinding.DialogEditTextBinding
 import io.legado.app.help.AppFreezeMonitor
 import io.legado.app.help.DispatchersMonitor
 import io.legado.app.help.config.AppConfig
-import io.legado.app.help.config.normalizeJsSourceApiToken
 import io.legado.app.help.http.Cronet
 import io.legado.app.lib.dialogs.alert
 import io.legado.app.lib.prefs.fragment.PreferenceFragment
@@ -32,8 +29,6 @@ import io.legado.app.lib.theme.primaryColor
 import io.legado.app.model.CheckSource
 import io.legado.app.model.ImageProvider
 import io.legado.app.receiver.SharedReceiverActivity
-import io.legado.app.service.McpService
-import io.legado.app.service.WebService
 import io.legado.app.ui.file.HandleFileContract
 import io.legado.app.ui.video.config.SettingsDialog
 import io.legado.app.ui.widget.code.addJsonPattern
@@ -78,36 +73,6 @@ class OtherConfigFragment : PreferenceFragment(),
         upPreferenceSummary(PreferKey.userAgent, AppConfig.userAgent)
         upPreferenceSummary(PreferKey.preDownloadNum, AppConfig.preDownloadNum.toString())
         upPreferenceSummary(PreferKey.threadCount, AppConfig.threadCount.toString())
-        upPreferenceSummary(PreferKey.webPort, AppConfig.webPort.toString())
-        upPreferenceSummary(PreferKey.mcpPort, AppConfig.mcpPort.toString())
-        findPreference<EditTextPreference>(PreferKey.jsSourceApiToken)?.let {
-            it.isPersistent = false
-            it.text = AppConfig.jsSourceApiToken
-            it.setOnPreferenceChangeListener { _, newValue ->
-                val previousToken = AppConfig.jsSourceApiToken
-                val token = normalizeJsSourceApiToken(newValue?.toString())
-                AppConfig.jsSourceApiToken = token
-                upPreferenceSummary(PreferKey.jsSourceApiToken, token)
-                if (
-                    McpService.isRun &&
-                    AppConfig.jsSourceApiTokenRequired &&
-                    previousToken != token
-                ) {
-                    if (token == null) {
-                        McpService.stop(requireContext())
-                    } else {
-                        McpService.restart(requireContext())
-                    }
-                }
-                true
-            }
-            it.setOnBindEditTextListener { editText ->
-                editText.inputType =
-                    InputType.TYPE_TEXT_VARIATION_PASSWORD or InputType.TYPE_CLASS_TEXT
-                editText.setSelection(editText.text.length)
-            }
-        }
-        upPreferenceSummary(PreferKey.jsSourceApiToken, AppConfig.jsSourceApiToken)
         AppConfig.defaultBookTreeUri?.let {
             upPreferenceSummary(PreferKey.defaultBookTreeUri, it)
         }
@@ -162,24 +127,6 @@ class OtherConfigFragment : PreferenceFragment(),
                     AppConfig.threadCount = it
                 }
 
-            PreferKey.webPort -> NumberPickerDialog(requireContext())
-                .setTitle(getString(R.string.web_port_title))
-                .setMaxValue(60000)
-                .setMinValue(1024)
-                .setValue(AppConfig.webPort)
-                .show {
-                    AppConfig.webPort = it
-                }
-
-            PreferKey.mcpPort -> NumberPickerDialog(requireContext())
-                .setTitle(getString(R.string.mcp_port_title))
-                .setMaxValue(65530)
-                .setMinValue(1024)
-                .setValue(AppConfig.mcpPort)
-                .show {
-                    AppConfig.mcpPort = it
-                }
-
             PreferKey.cleanCache -> clearCache()
             PreferKey.uploadRule -> showDialogFragment<DirectLinkUploadConfig>()
             PreferKey.checkSource -> showDialogFragment<CheckSourceConfig>()
@@ -229,31 +176,6 @@ class OtherConfigFragment : PreferenceFragment(),
             PreferKey.threadCount -> {
                 upPreferenceSummary(key, AppConfig.threadCount.toString())
                 postEvent(PreferKey.threadCount, "")
-            }
-
-            PreferKey.webPort -> {
-                upPreferenceSummary(key, AppConfig.webPort.toString())
-                if (WebService.isRun) {
-                    WebService.stop(requireContext())
-                    WebService.start(requireContext())
-                }
-            }
-
-            PreferKey.mcpPort -> {
-                upPreferenceSummary(key, AppConfig.mcpPort.toString())
-                if (McpService.isRun) {
-                    McpService.restart(requireContext())
-                }
-            }
-
-            PreferKey.jsSourceApiTokenRequired -> {
-                if (WebService.isRun) {
-                    WebService.stop(requireContext())
-                    WebService.start(requireContext())
-                }
-                if (McpService.isRun) {
-                    McpService.restart(requireContext())
-                }
             }
 
             PreferKey.defaultBookTreeUri -> {
@@ -345,13 +267,6 @@ class OtherConfigFragment : PreferenceFragment(),
                 getString(R.string.pre_download_s, value)
 
             PreferKey.threadCount -> preference.summary = getString(R.string.threads_num, value)
-            PreferKey.webPort -> preference.summary = getString(R.string.web_port_summary, value)
-            PreferKey.mcpPort -> preference.summary = getString(R.string.mcp_port_summary, value)
-            PreferKey.jsSourceApiToken -> preference.summary = if (value.isNullOrBlank()) {
-                getString(R.string.js_source_api_token_summary)
-            } else {
-                getString(R.string.js_source_api_token_configured)
-            }
             PreferKey.bitmapCacheSize -> preference.summary =
                 getString(R.string.bitmap_cache_size_summary, value)
             PreferKey.imageRetainNum -> preference.summary =

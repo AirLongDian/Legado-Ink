@@ -30,13 +30,11 @@ import io.legado.app.help.config.AppConfig
 import io.legado.app.help.config.LocalConfig
 import io.legado.app.help.config.ReadBookConfig
 import io.legado.app.lib.dialogs.alert
-import io.legado.app.lib.dialogs.selector
 import io.legado.app.lib.theme.ThemeStore
 import io.legado.app.lib.theme.bottomBackground
 import io.legado.app.model.CacheBook
 import io.legado.app.model.ReadBook
 import io.legado.app.model.localBook.LocalBook
-import io.legado.app.ui.book.read.config.BgTextConfigDialog
 import io.legado.app.ui.book.read.config.ClickActionConfigDialog
 import io.legado.app.ui.book.read.config.PaddingConfigDialog
 import io.legado.app.ui.book.read.config.PageKeyDialog
@@ -161,10 +159,6 @@ abstract class BaseReadBookActivity :
 
     fun showPaddingConfig() {
         showDialogFragment<PaddingConfigDialog>()
-    }
-
-    fun showBgTextConfig() {
-        showDialogFragment<BgTextConfigDialog>()
     }
 
     fun showClickRegionalConfig() {
@@ -371,20 +365,6 @@ abstract class BaseReadBookActivity :
                 }
             }
             cancelButton()
-        }
-    }
-
-    fun showPageAnimConfig(success: () -> Unit) {
-        val items = arrayListOf<String>()
-        items.add(getString(R.string.btn_default_s))
-        items.add(getString(R.string.page_anim_cover))
-        items.add(getString(R.string.page_anim_slide))
-        items.add(getString(R.string.page_anim_simulation))
-        items.add(getString(R.string.page_anim_scroll))
-        items.add(getString(R.string.page_anim_none))
-        selector(R.string.page_anim, items) { _, i ->
-            ReadBook.book?.setPageAnim(i - 1)
-            success()
         }
     }
 

@@ -57,11 +57,7 @@ object ThemeConfig {
 
     private var needClearImg = true
 
-    fun getTheme() = when {
-        AppConfig.isEInkMode -> Theme.EInk
-        AppConfig.isNightTheme -> Theme.Dark
-        else -> Theme.Light
-    }
+    fun getTheme() = Theme.EInk
 
     fun isDarkTheme(): Boolean {
         return getTheme() == Theme.Dark
@@ -84,13 +80,7 @@ object ThemeConfig {
     }
 
     private fun initNightMode() {
-        val targetMode =
-            if (AppConfig.isNightTheme) {
-                AppCompatDelegate.MODE_NIGHT_YES
-            } else {
-                AppCompatDelegate.MODE_NIGHT_NO
-            }
-        AppCompatDelegate.setDefaultNightMode(targetMode)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
     }
 
     /**

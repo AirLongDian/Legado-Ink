@@ -2,14 +2,9 @@
 
     //**************************************************************Theme******************************************************************************//
 
-    <!-- 亮色主题 -->
-    <style name="AppTheme.Light" parent="Base.AppTheme">
-        <item name="actionBarStyle">@style/AppTheme.AppBarOverlay.Light</item>
-    </style>
-
-    <!-- 暗色主题 -->
-    <style name="AppTheme.Dark" parent="Base.AppTheme">
-        <item name="actionBarStyle">@style/AppTheme.AppBarOverlay.Dark</item>
+    <!-- 固定黑白墨水屏主题 -->
+    <style name="AppTheme.EInk" parent="Base.AppTheme">
+        <item name="actionBarStyle">@style/AppTheme.AppBarOverlay.EInk</item>
     </style>
 
     <!-- 透明主题 -->
@@ -34,6 +29,9 @@
         <item name="android:popupMenuStyle">@style/Style.PopupMenu</item>
         <item name="android:statusBarColor">@color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:colorControlHighlight">@android:color/transparent</item>
+        <item name="colorControlHighlight">@android:color/transparent</item>
     </style>
 
     <!-- Keep the existing Design bottom-sheet behavior while opting this dialog into edge-to-edge. -->
@@ -47,12 +45,8 @@
         <item name="paddingTopSystemWindowInsets">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay.Light" parent="ThemeOverlay.AppCompat.Light">
+    <style name="AppTheme.AppBarOverlay.EInk" parent="ThemeOverlay.AppCompat.Light">
         <item name="colorAccent">@color/md_grey_900</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay.Dark" parent="ThemeOverlay.AppCompat.Dark">
-        <item name="colorAccent">@color/md_grey_50</item>
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">

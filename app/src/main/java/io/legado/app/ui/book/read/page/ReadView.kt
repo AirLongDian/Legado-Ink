@@ -1,6 +1,5 @@
 package io.legado.app.ui.book.read.page
 
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
@@ -17,7 +16,6 @@ import android.widget.Magnifier
 import androidx.annotation.RequiresApi
 import io.legado.app.BuildConfig
 import io.legado.app.R
-import io.legado.app.constant.PageAnim
 import io.legado.app.data.entities.BookProgress
 import io.legado.app.help.config.AppConfig
 import io.legado.app.help.config.ReadBookConfig
@@ -26,13 +24,8 @@ import io.legado.app.model.ReadBook
 import io.legado.app.service.BaseReadAloudService
 import io.legado.app.ui.book.read.ContentEditDialog
 import io.legado.app.ui.book.read.page.api.DataSource
-import io.legado.app.ui.book.read.page.delegate.CoverPageDelegate
-import io.legado.app.ui.book.read.page.delegate.HorizontalPageDelegate
 import io.legado.app.ui.book.read.page.delegate.NoAnimPageDelegate
 import io.legado.app.ui.book.read.page.delegate.PageDelegate
-import io.legado.app.ui.book.read.page.delegate.ScrollPageDelegate
-import io.legado.app.ui.book.read.page.delegate.SimulationPageDelegate
-import io.legado.app.ui.book.read.page.delegate.SlidePageDelegate
 import io.legado.app.ui.book.read.page.entities.PageDirection
 import io.legado.app.ui.book.read.page.entities.TextChapter
 import io.legado.app.ui.book.read.page.entities.TextLine
@@ -207,7 +200,6 @@ class ReadView(context: Context, attrs: AttributeSet) :
         get() = resolvePullBookmarkDistance(AppConfig.pullBookmarkDistance, slopSquare)
     private var pullBookmarkCandidate = false
     private var pullBookmarkState = PullBookmarkGestureState.NONE
-    private var pullBookmarkAnimator: ValueAnimator? = null
     private var pageSlopSquare: Int = slopSquare
     var pageSlopSquare2: Int = pageSlopSquare * pageSlopSquare
     private var pageTouchClick: Int = 0
@@ -597,20 +589,7 @@ class ReadView(context: Context, attrs: AttributeSet) :
     private fun resetPullBookmarkGesture(animatePage: Boolean = true) {
         pullBookmarkCandidate = false
         pullBookmarkState = PullBookmarkGestureState.NONE
-        pullBookmarkAnimator?.cancel()
-        pullBookmarkAnimator = null
-        val startOffset = curPage.translationY
-        if (!animatePage || startOffset == 0f) {
-            setPullBookmarkPageOffset(0f)
-            return
-        }
-        pullBookmarkAnimator = ValueAnimator.ofFloat(startOffset, 0f).apply {
-            duration = defaultAnimationSpeed.toLong()
-            addUpdateListener {
-                setPullBookmarkPageOffset(it.animatedValue as Float)
-            }
-            start()
-        }
+        setPullBookmarkPageOffset(0f)
     }
 
     private fun setPullBookmarkPageOffset(offset: Float) {
@@ -945,45 +924,17 @@ class ReadView(context: Context, attrs: AttributeSet) :
      * 更新翻页动画
      */
     fun upPageAnim(upRecorder: Boolean = false) {
-        val scroll = ReadBook.pageAnim() == PageAnim.scrollPageAnim
-        if (pageDelegate != null) updateScrollReadPosition(preserveText = isScroll != scroll)
-        isScroll = scroll
+        if (pageDelegate != null && isScroll) updateScrollReadPosition(preserveText = true)
+        isScroll = false
         // Runtime changes rebind content; initial inflation must not access Activity callbacks yet.
-        if (pageDelegate != null) curPage.setIsScroll(isScroll)
+        if (pageDelegate != null) curPage.setIsScroll(false)
         ChapterProvider.upLayout()
-        when (ReadBook.pageAnim()) {
-            PageAnim.coverPageAnim -> if (pageDelegate !is CoverPageDelegate) {
-                pageDelegate = CoverPageDelegate(this)
-            }
-
-            PageAnim.slidePageAnim -> if (pageDelegate !is SlidePageDelegate) {
-                pageDelegate = SlidePageDelegate(this)
-            }
-
-            PageAnim.simulationPageAnim -> if (pageDelegate !is SimulationPageDelegate) {
-                pageDelegate = SimulationPageDelegate(this)
-            }
-
-            PageAnim.scrollPageAnim -> if (pageDelegate !is ScrollPageDelegate) {
-                pageDelegate = ScrollPageDelegate(this)
-            }
-
-            else -> if (pageDelegate !is NoAnimPageDelegate) {
-                pageDelegate = NoAnimPageDelegate(this)
-            }
-        }
-        (pageDelegate as? ScrollPageDelegate)?.noAnim = AppConfig.noAnimScrollPage
-        if (upRecorder) {
-            (pageDelegate as? HorizontalPageDelegate)?.upRecorder()
-            autoPager.upRecorder()
+        if (pageDelegate !is NoAnimPageDelegate) {
+            pageDelegate = NoAnimPageDelegate(this)
         }
         pageDelegate?.setViewSize(width, height)
-        if (isScroll) {
-            curPage.setAutoPager(autoPager)
-        } else {
-            curPage.setAutoPager(null)
-        }
-        curPage.setIsScroll(isScroll)
+        curPage.setAutoPager(null)
+        curPage.setIsScroll(false)
     }
 
     /**

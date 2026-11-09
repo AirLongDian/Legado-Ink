@@ -4,32 +4,29 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.w3c.dom.Element
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
 class FilletButtonBackgroundTest {
 
     @Test
-    fun `fillet button background uses a rounded ripple mask`() {
+    fun `fillet button background is a static rounded shape`() {
         val drawable = projectFile("src/main/res/drawable/bg_fillet_btn.xml")
         val document = DocumentBuilderFactory.newInstance().apply {
             isNamespaceAware = true
         }.newDocumentBuilder().parse(drawable)
         val root = document.documentElement
 
-        assertEquals("ripple", root.tagName)
+        assertEquals("shape", root.tagName)
         assertEquals(
-            "?android:attr/colorControlHighlight",
-            root.getAttributeNS(ANDROID_NS, "color")
+            "rectangle",
+            root.getAttributeNS(ANDROID_NS, "shape")
         )
-
-        val items = document.getElementsByTagName("item")
-        val mask = (0 until items.length)
-            .asSequence()
-            .map { items.item(it) as Element }
-            .firstOrNull { it.getAttributeNS(ANDROID_NS, "id") == "@android:id/mask" }
-        assertTrue("Ripple should be clipped to the rounded button shape", mask != null)
+        val corners = document.getElementsByTagName("corners").item(0)
+        val solid = document.getElementsByTagName("solid").item(0)
+        assertEquals("16dp", corners.attributes.getNamedItemNS(ANDROID_NS, "radius").nodeValue)
+        assertEquals("@color/btn_bg_press", solid.attributes.getNamedItemNS(ANDROID_NS, "color").nodeValue)
+        assertFalse(drawable.readText().contains("<ripple"))
     }
 
     @Test

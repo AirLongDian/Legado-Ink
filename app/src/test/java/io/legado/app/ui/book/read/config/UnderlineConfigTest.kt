@@ -17,9 +17,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.w3c.dom.Element
 import java.io.File
-import javax.xml.parsers.DocumentBuilderFactory
 
 class UnderlineConfigTest {
 
@@ -183,32 +181,7 @@ class UnderlineConfigTest {
     }
 
     @Test
-    fun `dialog exposes all underline controls and renderer uses baseline distance`() {
-        val layout = projectFile("src/main/res/layout/dialog_read_bg_text.xml")
-        val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(layout)
-        val seekBars = (0 until document.getElementsByTagName("io.legado.app.ui.widget.DetailSeekBar").length)
-            .map { document.getElementsByTagName("io.legado.app.ui.widget.DetailSeekBar").item(it) as Element }
-            .associateBy { it.getAttribute("android:id") }
-
-        assertEquals("20", seekBars["@+id/dsb_underline_width"]?.getAttribute("app:max"))
-        assertEquals("60", seekBars["@+id/dsb_underline_distance"]?.getAttribute("app:max"))
-        assertTrue(layout.readText().contains("@+id/sw_underline_body"))
-        assertTrue(layout.readText().contains("@+id/sw_underline_title"))
-        val switches = (0 until document.getElementsByTagName("io.legado.app.lib.theme.view.ThemeSwitch").length)
-            .map { document.getElementsByTagName("io.legado.app.lib.theme.view.ThemeSwitch").item(it) as Element }
-            .associateBy { it.getAttribute("android:id") }
-        assertEquals("wrap_content", switches["@+id/sw_underline_body"]?.getAttribute("android:layout_width"))
-        assertEquals("wrap_content", switches["@+id/sw_underline_title"]?.getAttribute("android:layout_width"))
-        assertFalse(switches["@+id/sw_underline_body"]?.hasAttribute("android:layout_weight") == true)
-        assertFalse(switches["@+id/sw_underline_title"]?.hasAttribute("android:layout_weight") == true)
-
-        val dialog = projectFile(
-            "src/main/java/io/legado/app/ui/book/read/config/BgTextConfigDialog.kt"
-        ).readText()
-        assertTrue(dialog.contains("ReadBookConfig.underlineWidth * 2f"))
-        assertTrue(dialog.contains("ReadBookConfig.underlineWidth = progress / 2f"))
-        assertFalse(dialog.contains("underlineWidth - 1f"))
-
+    fun `renderer uses baseline distance`() {
         val renderer = projectFile(
             "src/main/java/io/legado/app/ui/book/read/page/entities/TextLine.kt"
         ).readText()

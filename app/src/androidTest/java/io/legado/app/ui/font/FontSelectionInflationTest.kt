@@ -15,15 +15,13 @@ import org.junit.runner.RunWith
 class FontSelectionInflationTest {
 
     @Test
-    fun itemFontInflatesWithAppCompatThemes() {
+    fun itemFontInflatesWithEInkTheme() {
         val appContext = ApplicationProvider.getApplicationContext<Context>()
-        listOf(R.style.AppTheme_Light, R.style.AppTheme_Dark).forEach { theme ->
-            val context = ContextThemeWrapper(appContext, theme)
-            ItemFontBinding.inflate(
-                LayoutInflater.from(context),
-                FrameLayout(context),
-                false,
-            )
-        }
+        val context = ContextThemeWrapper(appContext, R.style.AppTheme_EInk)
+        ItemFontBinding.inflate(
+            LayoutInflater.from(context),
+            FrameLayout(context),
+            false,
+        )
     }
 }

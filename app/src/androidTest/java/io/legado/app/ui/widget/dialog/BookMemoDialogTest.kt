@@ -110,12 +110,12 @@ class BookMemoDialogTest {
                 !it.findViewById<ReadView>(R.id.read_view).curPage.textPage.isMsgPage && it.bottomDialog == 0
         }
         scenario!!.onActivity {
-            it.findViewById<ReadMenu>(R.id.read_menu).runMenuIn(false)
+            it.findViewById<ReadMenu>(R.id.read_menu).runMenuIn()
             assertEquals(View.GONE, it.findViewById<View>(R.id.ll_memo).visibility)
         }
         preferences.edit().putBoolean(PreferKey.showBookMemo, true).commit()
         scenario!!.onActivity {
-            it.findViewById<ReadMenu>(R.id.read_menu).runMenuIn(false)
+            it.findViewById<ReadMenu>(R.id.read_menu).runMenuIn()
         }
         for (id in listOf(R.id.ll_catalog, R.id.ll_read_aloud, R.id.ll_font, R.id.ll_setting, R.id.ll_memo)) {
             onView(withId(id)).check(matches(isCompletelyDisplayed()))

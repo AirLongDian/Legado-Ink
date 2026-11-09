@@ -64,7 +64,9 @@ android {
     }
     defaultConfig {
         applicationId "com.legado.app"
-        minSdk 23
+        // This e-ink fork targets the Android 8 device. The current Rhino runtime uses
+        // MethodHandle.invoke, which D8 can only package for API 26 and newer.
+        minSdk 26
         targetSdk 36
         versionCode = versionCodeValue
         versionName version
@@ -327,20 +329,8 @@ dependencies {
     //Glide svg plugin
     implementation(libs.glide.svg)
 
-    //webServer
+    // Used only for direct LAN backup transfer; the browser Web service is removed.
     implementation(libs.nanohttpd.nanohttpd)
-    implementation(libs.nanohttpd.websocket)
-
-    //MCP server (Streamable HTTP)
-    implementation(libs.mcp.sdk.server) {
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
-    }
-    implementation(libs.ktor.server.cio) {
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
-    }
-    testImplementation(libs.ktor.server.test.host) {
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
-    }
 
     //二维码
     //noinspection GradleDependency

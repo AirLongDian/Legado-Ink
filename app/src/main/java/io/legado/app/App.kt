@@ -19,7 +19,7 @@ import io.legado.app.base.AppContextWrapper
 import io.legado.app.constant.AppLog
 import io.legado.app.constant.AppConst.channelIdDownload
 import io.legado.app.constant.AppConst.channelIdReadAloud
-import io.legado.app.constant.AppConst.channelIdWeb
+import io.legado.app.constant.AppConst.channelIdAutoTask
 import io.legado.app.constant.PreferKey
 import io.legado.app.data.appDb
 import io.legado.app.data.entities.Book
@@ -218,9 +218,9 @@ class App : Application() {
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         }
 
-        val webChannel = NotificationChannel(
-            channelIdWeb,
-            getString(R.string.web_service),
+        val autoTaskChannel = NotificationChannel(
+            channelIdAutoTask,
+            getString(R.string.auto_task_notify_title),
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
             enableLights(false)
@@ -234,7 +234,7 @@ class App : Application() {
             listOf(
                 downloadChannel,
                 readAloudChannel,
-                webChannel
+                autoTaskChannel
             )
         )
     }

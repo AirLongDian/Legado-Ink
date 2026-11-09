@@ -181,7 +181,7 @@ class ReadAloudScaleUiTest {
             scenario!!.onActivity {
                 assertEquals("Only the first visible action should receive its tap", 1, clicks[0])
                 assertEquals("Only the second visible action should receive its tap", 1, clicks[1])
-                it.findViewById<ReadMenu>(R.id.read_menu).runMenuOut(anim = false)
+                it.findViewById<ReadMenu>(R.id.read_menu).runMenuOut()
             }
             for (paused in listOf(false, true)) {
                 scenario!!.onActivity {

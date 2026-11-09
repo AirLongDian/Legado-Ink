@@ -43,7 +43,6 @@ abstract class DiffRecyclerAdapter<ITEM, VB : ViewBinding>(protected val context
     private var layoutState: Parcelable? = null
     private var suppressNextListChange = false
 
-    var itemAnimation: ItemAnimation? = null
 
     abstract val diffItemCallback: DiffUtil.ItemCallback<ITEM>
 
@@ -163,7 +162,6 @@ abstract class DiffRecyclerAdapter<ITEM, VB : ViewBinding>(protected val context
 
     override fun onViewAttachedToWindow(holder: ItemViewHolder) {
         super.onViewAttachedToWindow(holder)
-        addAnimation(holder)
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -175,26 +173,6 @@ abstract class DiffRecyclerAdapter<ITEM, VB : ViewBinding>(protected val context
                 override fun getSpanSize(position: Int): Int {
                     return getSpanSize(getItemViewType(position), position)
                 }
-            }
-        }
-    }
-
-    private fun addAnimation(holder: ItemViewHolder) {
-        itemAnimation?.let {
-            if (it.itemAnimEnabled) {
-                if (!it.itemAnimFirstOnly || holder.layoutPosition > it.itemAnimStartPosition) {
-                    startAnimation(holder, it)
-                    it.itemAnimStartPosition = holder.layoutPosition
-                }
-            }
-        }
-    }
-
-    protected open fun startAnimation(holder: ItemViewHolder, item: ItemAnimation) {
-        item.itemAnimation?.let {
-            for (anim in it.getAnimators(holder.itemView)) {
-                anim.setDuration(item.itemAnimDuration).start()
-                anim.interpolator = item.itemAnimInterpolator
             }
         }
     }

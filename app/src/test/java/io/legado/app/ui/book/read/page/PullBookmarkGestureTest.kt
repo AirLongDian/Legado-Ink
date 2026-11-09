@@ -26,7 +26,7 @@ class PullBookmarkGestureTest {
     }
 
     @Test
-    fun `bookmark pull moves the page with bounded resistance and rebounds`() {
+    fun `bookmark pull moves with bounded resistance and resets immediately`() {
         assertEquals(0f, resolvePullBookmarkPageOffset(-20f, 1000), 0.001f)
         assertEquals(50f, resolvePullBookmarkPageOffset(100f, 1000), 0.001f)
         assertEquals(350f, resolvePullBookmarkPageOffset(1000f, 1000), 0.001f)
@@ -35,7 +35,10 @@ class PullBookmarkGestureTest {
         val move = readView.substringAfter("MotionEvent.ACTION_MOVE ->")
             .substringBefore("MotionEvent.ACTION_UP ->")
         assertTrue(move.contains("setPullBookmarkPageOffset("))
-        assertTrue(readView.contains("ValueAnimator.ofFloat(startOffset, 0f)"))
+        assertFalse(readView.contains("ValueAnimator"))
+        val reset = readView.substringAfter("private fun resetPullBookmarkGesture")
+            .substringBefore("private fun setPullBookmarkPageOffset")
+        assertTrue(reset.contains("setPullBookmarkPageOffset(0f)"))
         val pointerChange = readView.substringAfter("//在多点触控时")
             .substringBefore("when (event.actionMasked)")
         assertTrue(pointerChange.contains("resetPullBookmarkGesture(animatePage = false)"))
@@ -193,18 +196,11 @@ class PullBookmarkGestureTest {
         assertTrue(longIndicator.contains("android:height=\"40dp\""))
         assertTrue(longIndicator.contains("android:pathData=\"M4,0h12v40"))
 
-        val horizontal = source(
-            "app/src/main/java/io/legado/app/ui/book/read/page/delegate/HorizontalPageDelegate.kt"
+        val noAnim = source(
+            "app/src/main/java/io/legado/app/ui/book/read/page/delegate/NoAnimPageDelegate.kt"
         )
-        val cover = source(
-            "app/src/main/java/io/legado/app/ui/book/read/page/delegate/CoverPageDelegate.kt"
-        )
-        val simulation = source(
-            "app/src/main/java/io/legado/app/ui/book/read/page/delegate/SimulationPageDelegate.kt"
-        )
-        assertTrue(horizontal.contains("curPage.screenshot(curRecorder)"))
-        assertTrue(cover.contains("curPage.screenshot(curRecorder)"))
-        assertTrue(simulation.contains("curPage.screenshot(curBitmap, canvas)"))
+        assertFalse(noAnim.contains("screenshot"))
+        assertFalse(noAnim.contains("ValueAnimator"))
         assertTrue(activity.substringAfter("private fun resetBookmarkObserver()")
             .substringBefore("fun upBookmarkIndicator()")
             .contains("curPage.showBookmarkIndicator(false)"))

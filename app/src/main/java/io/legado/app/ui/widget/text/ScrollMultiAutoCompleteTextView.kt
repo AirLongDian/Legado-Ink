@@ -7,16 +7,11 @@ import android.text.method.MetaKeyKeyListener
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
-import android.view.VelocityTracker
 import android.view.ViewConfiguration
-import android.view.animation.Interpolator
-import android.widget.OverScroller
 import androidx.appcompat.widget.AppCompatMultiAutoCompleteTextView
-import androidx.core.view.ViewCompat
 import io.legado.app.lib.theme.accentColor
 import io.legado.app.utils.ColorUtils
 import kotlin.math.abs
-import kotlin.math.max
 import kotlin.math.min
 
 internal fun IndexOutOfBoundsException.isMissingSelectionSpan(): Boolean =
@@ -35,25 +30,12 @@ open class ScrollMultiAutoCompleteTextView @JvmOverloads constructor(
 
     private val scrollStateIdle = 0
     private val scrollStateDragging = 1
-    val scrollStateSettling = 2
-
-    private val mViewFling: ViewFling by lazy { ViewFling() }
-    private val velocityTracker: VelocityTracker by lazy { VelocityTracker.obtain() }
     private var mScrollState = scrollStateIdle
     private var mLastTouchY: Int = 0
     private var mTouchSlop: Int = 0
-    private var mMinFlingVelocity: Int = 0
-    private var mMaxFlingVelocity: Int = 0
 
     //滑动距离的最大边界
     private var mOffsetHeight: Int = 0
-
-    //f(x) = (x-1)^5 + 1
-    private val sQuinticInterpolator = Interpolator {
-        var t = it
-        t -= 1.0f
-        t * t * t * t * t + 1.0f
-    }
 
     private val gestureDetector = GestureDetector(context,
         object : GestureDetector.SimpleOnGestureListener() {
@@ -85,8 +67,6 @@ open class ScrollMultiAutoCompleteTextView @JvmOverloads constructor(
     init {
         val vc = ViewConfiguration.get(context)
         mTouchSlop = vc.scaledTouchSlop
-        mMinFlingVelocity = vc.scaledMinimumFlingVelocity
-        mMaxFlingVelocity = vc.scaledMaximumFlingVelocity
         highlightColor = ColorUtils.adjustAlpha(context.accentColor, 0.35f)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             isLocalePreferredLineHeightForMinimumUsed = false
@@ -112,7 +92,6 @@ open class ScrollMultiAutoCompleteTextView @JvmOverloads constructor(
         if (lineCount > maxLines) {
             gestureDetector.onTouchEvent(event)
         }
-        velocityTracker.addMovement(event)
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 setScrollState(scrollStateIdle)
@@ -141,18 +120,9 @@ open class ScrollMultiAutoCompleteTextView @JvmOverloads constructor(
                 }
             }
             MotionEvent.ACTION_UP -> {
-                velocityTracker.computeCurrentVelocity(1000, mMaxFlingVelocity.toFloat())
-                val yVelocity = velocityTracker.yVelocity
-                if (abs(yVelocity) > mMinFlingVelocity) {
-                    mViewFling.fling(-yVelocity.toInt())
-                } else {
-                    setScrollState(scrollStateIdle)
-                }
-                resetTouch()
+                setScrollState(scrollStateIdle)
             }
-            MotionEvent.ACTION_CANCEL -> {
-                resetTouch()
-            }
+            MotionEvent.ACTION_CANCEL -> setScrollState(scrollStateIdle)
         }
         return super.dispatchTouchEvent(event)
     }
@@ -200,89 +170,11 @@ open class ScrollMultiAutoCompleteTextView @JvmOverloads constructor(
         }
     }
 
-    private fun resetTouch() {
-        velocityTracker.clear()
-    }
-
     private fun setScrollState(state: Int) {
         if (state == mScrollState) {
             return
         }
         mScrollState = state
-        if (state != scrollStateSettling) {
-            mViewFling.stop()
-        }
-    }
-
-    /**
-     * 惯性滚动
-     */
-    private inner class ViewFling : Runnable {
-
-        private var mLastFlingY = 0
-        private val mScroller: OverScroller = OverScroller(context, sQuinticInterpolator)
-        private var mEatRunOnAnimationRequest = false
-        private var mReSchedulePostAnimationCallback = false
-
-        override fun run() {
-            disableRunOnAnimationRequests()
-            val scroller = mScroller
-            if (scroller.computeScrollOffset()) {
-                val y = scroller.currY
-                val dy = y - mLastFlingY
-                mLastFlingY = y
-                if (dy < 0 && scrollY > 0) {
-                    scrollBy(0, max(dy, -scrollY))
-                } else if (dy > 0 && scrollY < mOffsetHeight) {
-                    scrollBy(0, min(dy, mOffsetHeight - scrollY))
-                }
-                postOnAnimation()
-            }
-            enableRunOnAnimationRequests()
-        }
-
-        fun fling(velocityY: Int) {
-            mLastFlingY = 0
-            setScrollState(scrollStateSettling)
-            mScroller.fling(
-                0,
-                0,
-                0,
-                velocityY,
-                Integer.MIN_VALUE,
-                Integer.MAX_VALUE,
-                Integer.MIN_VALUE,
-                Integer.MAX_VALUE
-            )
-            postOnAnimation()
-        }
-
-        fun stop() {
-            removeCallbacks(this)
-            mScroller.abortAnimation()
-        }
-
-        private fun disableRunOnAnimationRequests() {
-            mReSchedulePostAnimationCallback = false
-            mEatRunOnAnimationRequest = true
-        }
-
-        private fun enableRunOnAnimationRequests() {
-            mEatRunOnAnimationRequest = false
-            if (mReSchedulePostAnimationCallback) {
-                postOnAnimation()
-            }
-        }
-
-        @Suppress("DEPRECATION")
-        fun postOnAnimation() {
-            if (mEatRunOnAnimationRequest) {
-                mReSchedulePostAnimationCallback = true
-            } else {
-                removeCallbacks(this)
-                ViewCompat.postOnAnimation(this@ScrollMultiAutoCompleteTextView, this)
-            }
-        }
     }
 
 }

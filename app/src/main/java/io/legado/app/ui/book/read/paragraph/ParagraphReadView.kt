@@ -354,7 +354,7 @@ class ParagraphReadView @JvmOverloads constructor(
 
     fun scrollScreen(forward: Boolean) {
         beginUserScroll()
-        list.smoothScrollBy(0, (list.height - list.paddingTop).coerceAtLeast(1) * if (forward) 1 else -1)
+        list.scrollBy(0, (list.height - list.paddingTop).coerceAtLeast(1) * if (forward) 1 else -1)
     }
 
     fun scrollByPixels(distance: Int) {

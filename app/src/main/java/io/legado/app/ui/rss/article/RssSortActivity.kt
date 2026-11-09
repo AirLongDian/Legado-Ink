@@ -196,9 +196,9 @@ class RssSortActivity : VMBaseActivity<ActivityRssArtivlesBinding, RssSortViewMo
             val padding = 12.dpToPx()
             when {
                 tabLeft - padding < scrollView.scrollX ->
-                    scrollView.smoothScrollTo(tabLeft - padding, 0)
+                    scrollView.scrollTo(tabLeft - padding, 0)
                 tabRight + padding > scrollView.scrollX + scrollViewWidth ->
-                    scrollView.smoothScrollTo(tabRight - scrollViewWidth + padding, 0)
+                    scrollView.scrollTo(tabRight - scrollViewWidth + padding, 0)
             }
         }
     }

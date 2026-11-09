@@ -36,14 +36,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ParagraphReadHighlightUiTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
-    private val savedEInkMode = AppConfig.isEInkMode
     private lateinit var reader: ParagraphReadView
     private lateinit var list: RecyclerView
     private lateinit var chapter: TextChapter
 
     @Before fun setUp() = instrumentation.runOnMainSync {
-        AppConfig.isEInkMode = false
-        reader = ParagraphReadView(ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme_Light))
+        reader = ParagraphReadView(ContextThemeWrapper(instrumentation.targetContext, R.style.AppTheme_EInk))
         list = reader.getChildAt(0) as RecyclerView
     }
 
@@ -53,7 +51,6 @@ class ParagraphReadHighlightUiTest {
             // Recycle holders even though this focused fixture never creates an activity window.
             list.adapter = null
         }
-        AppConfig.isEInkMode = savedEInkMode
     }
 
     @Test fun speechProgressColorsNativeTextWithoutRebindingOrMovingTheList() = onMain {
@@ -171,7 +168,6 @@ class ParagraphReadHighlightUiTest {
         layoutReader()
         assertColor(textAt(0), 3, items[0].text.length)
 
-        AppConfig.isEInkMode = true
         reader.upStyle()
         layoutReader()
         val inkText = textAt(0)
@@ -181,11 +177,6 @@ class ParagraphReadHighlightUiTest {
         assertEquals(3, inkBuffer.getSpanStart(underline))
         assertEquals(items[0].text.length, inkBuffer.getSpanEnd(underline))
 
-        AppConfig.isEInkMode = false
-        reader.upStyle()
-        layoutReader()
-        assertTrue(underlines(textAt(0)).isEmpty())
-        assertColor(textAt(0), 3, items[0].text.length)
         list.scrollToPosition(30)
         layoutReader()
         // Clear while the old highlighted holder is cached rather than rebound.
