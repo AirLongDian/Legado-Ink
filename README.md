@@ -15,7 +15,7 @@
   <a href="LICENSE"><img alt="GPL-3.0" src="https://img.shields.io/badge/License-GPL--3.0-blue.svg"></a>
 </p>
 
-Legado Ink 基于 [Legado](https://github.com/LegadoTeam/legado) 裁剪，目标是在墨水屏设备（包括老旧设备与低性能设备）上获得更直接的操作反馈、更少的闪烁与残影，以及低规格设备上更好的优化与性能。
+Legado Ink 基于 Legado 修改，目标是在墨水屏设备（包括老旧设备与低性能设备）上获得更直接的操作反馈、更少的闪烁与残影，以及低规格设备上更好的优化与性能。
 
 本项目并非 Legado 官方版本。
 
