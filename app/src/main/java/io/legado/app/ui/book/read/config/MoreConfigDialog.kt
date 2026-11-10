@@ -27,6 +27,11 @@ import io.legado.app.utils.setEdgeEffectColor
 class MoreConfigDialog : DialogFragment() {
     private val readPreferTag = "readPreferenceFragment"
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.AppTheme_Dialog)
+    }
+
     override fun onStart() {
         super.onStart()
         dialog?.window?.let {

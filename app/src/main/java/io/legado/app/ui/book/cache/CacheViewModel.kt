@@ -166,8 +166,7 @@ class CacheViewModel(application: Application) : BaseViewModel(application) {
                         content ?: "null",
                         includeTitle = !AppConfig.exportNoChapterName,
                         useReplace = useReplace,
-                        chineseConvert = false,
-                        reSegment = false
+                        chineseConvert = false
                     ).joinToString("\n")
                 val srcList = arrayListOf<Triple<String, Int, String>>()
                 content?.split("\n")?.forEachIndexed { index, text ->
@@ -427,8 +426,7 @@ class CacheViewModel(application: Application) : BaseViewModel(application) {
                         content1,
                         includeTitle = false,
                         useReplace = useReplace,
-                        chineseConvert = false,
-                        reSegment = false
+                        chineseConvert = false
                     )
                     .joinToString("\n")
                 epubBook.addSection(

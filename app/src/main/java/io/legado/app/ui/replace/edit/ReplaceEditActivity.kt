@@ -16,10 +16,7 @@ import io.legado.app.base.VMBaseActivity
 import io.legado.app.constant.AppConst
 import io.legado.app.data.entities.ReplaceRule
 import io.legado.app.databinding.ActivityReplaceEditBinding
-import io.legado.app.lib.dialogs.selector
 import io.legado.app.ui.widget.KeyboardToolPop
-import io.legado.app.ui.widget.dialog.TextDialog
-import io.legado.app.utils.showDialogFragment
 import io.legado.app.utils.toastOnUi
 import io.legado.app.utils.viewbindingdelegate.viewBinding
 import io.legado.app.utils.windowSize
@@ -59,13 +56,10 @@ class ReplaceEditActivity :
     private var mIsSoftKeyBoardShowing = false
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        mSoftKeyboardTool = KeyboardToolPop(this, AppConst.keyboardToolChars, this)
+        mSoftKeyboardTool = KeyboardToolPop(this, AppConst.keyboardToolChars.drop(1), this)
         window.decorView.viewTreeObserver.addOnGlobalLayoutListener(this)
         viewModel.initData(intent) {
             upReplaceView(it)
-        }
-        binding.ivHelp.setOnClickListener {
-            showRegexHelp()
         }
     }
 
@@ -129,25 +123,7 @@ class ReplaceEditActivity :
     }
 
     override fun sendText(text: String) {
-        if (text == AppConst.keyboardToolChars[0]) {
-            showHelpDialog()
-        } else {
-            insertText(text)
-        }
-    }
-
-    private fun showHelpDialog() {
-        val items = arrayListOf("正则教程")
-        selector(getString(R.string.help), items) { _, index ->
-            when (index) {
-                0 -> showRegexHelp()
-            }
-        }
-    }
-
-    private fun showRegexHelp() {
-        val mdText = String(assets.open("help/regexHelp.md").readBytes())
-        showDialogFragment(TextDialog(mdText, TextDialog.Mode.MD))
+        insertText(text)
     }
 
     private fun showKeyboardTopPopupWindow() {

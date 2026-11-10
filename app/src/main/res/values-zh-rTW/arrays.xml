@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="book_type">
-        <item>文字</item>
-        <item>音訊</item>
-    </string-array>
 
     <string-array name="group_style">
         <item>標籤</item>
@@ -14,13 +10,6 @@
         <item>.txt</item>
         <item>.json</item>
         <item>.xml</item>
-    </string-array>
-
-    <string-array name="theme_mode">
-        <item>跟隨系統</item>
-        <item>亮色主題</item>
-        <item>暗色主題</item>
-        <item>E-Ink(墨水屏)</item>
     </string-array>
 
     <string-array name="NavBarColors">
@@ -38,15 +27,6 @@
         <item>常亮</item>
     </string-array>
 
-    <string-array name="icon_names">
-        <item>iconMain</item>
-        <item>icon1</item>
-        <item>icon2</item>
-        <item>icon3</item>
-        <item>icon4</item>
-        <item>icon5</item>
-        <item>icon6</item>
-    </string-array>
 
     <string-array name="chinese_mode">
         <item>關閉</item>

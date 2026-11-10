@@ -3,7 +3,6 @@ package io.legado.app.utils
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.transition.TransitionManager
 
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -35,7 +34,6 @@ class ConstraintModify(private val constraintLayout: ConstraintLayout) {
      * @return
      */
     fun beginWithAnim(): ConstraintBegin {
-        TransitionManager.beginDelayedTransition(constraintLayout)
         return begin()
     }
 
@@ -50,7 +48,6 @@ class ConstraintModify(private val constraintLayout: ConstraintLayout) {
      * 带动画的重置
      */
     fun reSetWidthAnim() {
-        TransitionManager.beginDelayedTransition(constraintLayout)
         resetConstraintSet.applyTo(constraintLayout)
     }
 

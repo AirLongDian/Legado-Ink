@@ -8,7 +8,6 @@ import io.legado.app.constant.PreferKey
 import io.legado.app.data.appDb
 import io.legado.app.help.DefaultData
 import io.legado.app.help.ReadBookConfig
-import io.legado.app.help.ThemeConfig
 import io.legado.app.help.coroutine.Coroutine
 import io.legado.app.utils.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -33,14 +32,10 @@ object Backup {
             "rssSources.json",
             "rssStar.json",
             "replaceRule.json",
-            "readRecord.json",
             "searchHistory.json",
             "sourceSub.json",
             DefaultData.txtTocRuleFileName,
-            DefaultData.httpTtsFileName,
             ReadBookConfig.configFileName,
-            ReadBookConfig.shareConfigFileName,
-            ThemeConfig.configFileName,
             "config.xml"
         )
     }
@@ -67,21 +62,11 @@ object Backup {
             writeListToJson(appDb.rssSourceDao.all, "rssSources.json", backupPath)
             writeListToJson(appDb.rssStarDao.all, "rssStar.json", backupPath)
             writeListToJson(appDb.replaceRuleDao.all, "replaceRule.json", backupPath)
-            writeListToJson(appDb.readRecordDao.all, "readRecord.json", backupPath)
             writeListToJson(appDb.searchKeywordDao.all, "searchHistory.json", backupPath)
             writeListToJson(appDb.ruleSubDao.all, "sourceSub.json", backupPath)
             writeListToJson(appDb.txtTocRuleDao.all, DefaultData.txtTocRuleFileName, backupPath)
-            writeListToJson(appDb.httpTTSDao.all, DefaultData.httpTtsFileName, backupPath)
             GSON.toJson(ReadBookConfig.configList).let {
                 FileUtils.createFileIfNotExist(backupPath + File.separator + ReadBookConfig.configFileName)
-                    .writeText(it)
-            }
-            GSON.toJson(ReadBookConfig.shareConfig).let {
-                FileUtils.createFileIfNotExist(backupPath + File.separator + ReadBookConfig.shareConfigFileName)
-                    .writeText(it)
-            }
-            GSON.toJson(ThemeConfig.configList).let {
-                FileUtils.createFileIfNotExist(backupPath + File.separator + ThemeConfig.configFileName)
                     .writeText(it)
             }
             Preferences.getSharedPreferences(appCtx, backupPath, "config")?.let { sp ->

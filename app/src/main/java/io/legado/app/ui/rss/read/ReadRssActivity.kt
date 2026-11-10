@@ -25,8 +25,6 @@ import io.legado.app.ui.login.SourceLoginActivity
 import io.legado.app.utils.*
 import io.legado.app.utils.viewbindingdelegate.viewBinding
 import kotlinx.coroutines.launch
-import org.apache.commons.text.StringEscapeUtils
-import org.jsoup.Jsoup
 import java.net.URLDecoder
 
 /**
@@ -39,7 +37,6 @@ class ReadRssActivity : VMBaseActivity<ActivityRssReadBinding, ReadRssViewModel>
     override val viewModel by viewModels<ReadRssViewModel>()
     private val imagePathKey = "imagePath"
     private var starMenuItem: MenuItem? = null
-    private var ttsMenuItem: MenuItem? = null
     private var customWebViewCallback: WebChromeClient.CustomViewCallback? = null
     private var webPic: String? = null
     private val saveImage = registerForActivityResult(HandleFileContract()) {
@@ -80,7 +77,6 @@ class ReadRssActivity : VMBaseActivity<ActivityRssReadBinding, ReadRssViewModel>
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         starMenuItem = menu?.findItem(R.id.menu_rss_star)
-        ttsMenuItem = menu?.findItem(R.id.menu_aloud)
         upStarMenu()
         return super.onPrepareOptionsMenu(menu)
     }
@@ -97,7 +93,6 @@ class ReadRssActivity : VMBaseActivity<ActivityRssReadBinding, ReadRssViewModel>
             R.id.menu_share_it -> viewModel.rssArticle?.let {
                 share(it.link)
             } ?: toastOnUi(R.string.null_url)
-            R.id.menu_aloud -> readAloud()
             R.id.menu_login -> startActivity<SourceLoginActivity> {
                 putExtra("type", "rssSource")
                 putExtra("key", viewModel.rssSource?.loginUrl)
@@ -224,19 +219,6 @@ class ReadRssActivity : VMBaseActivity<ActivityRssReadBinding, ReadRssViewModel>
         starMenuItem?.icon?.setTintMutate(primaryTextColor)
     }
 
-    override fun upTtsMenu(isPlaying: Boolean) {
-        launch {
-            if (isPlaying) {
-                ttsMenuItem?.setIcon(R.drawable.ic_stop_black_24dp)
-                ttsMenuItem?.setTitle(R.string.aloud_stop)
-            } else {
-                ttsMenuItem?.setIcon(R.drawable.ic_volume_up)
-                ttsMenuItem?.setTitle(R.string.read_aloud)
-            }
-            ttsMenuItem?.icon?.setTintMutate(primaryTextColor)
-        }
-    }
-
     override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
         when (keyCode) {
             KeyEvent.KEYCODE_BACK -> {
@@ -262,22 +244,6 @@ class ReadRssActivity : VMBaseActivity<ActivityRssReadBinding, ReadRssViewModel>
             }
         }
         return super.onKeyUp(keyCode, event)
-    }
-
-    @SuppressLint("SetJavaScriptEnabled")
-    private fun readAloud() {
-        if (viewModel.textToSpeech?.isSpeaking == true) {
-            viewModel.textToSpeech?.stop()
-            upTtsMenu(false)
-        } else {
-            binding.webView.settings.javaScriptEnabled = true
-            binding.webView.evaluateJavascript("document.documentElement.outerHTML") {
-                val html = StringEscapeUtils.unescapeJson(it)
-                    .replace("^\"|\"$".toRegex(), "")
-                Jsoup.parse(html).text()
-                viewModel.readAloud(Jsoup.parse(html).textArray())
-            }
-        }
     }
 
     override fun onDestroy() {

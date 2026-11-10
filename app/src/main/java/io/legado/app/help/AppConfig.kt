@@ -12,7 +12,7 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
     val isGooglePlay = appCtx.channel == "google"
     val isCronet = appCtx.getPrefBoolean("Cronet")
     var userAgent: String = getPrefUserAgent()
-    var isEInkMode = appCtx.getPrefString(PreferKey.themeMode) == "3"
+    const val isEInkMode = true
     var clickActionTL = appCtx.getPrefInt(PreferKey.clickActionTL, 2)
     var clickActionTC = appCtx.getPrefInt(PreferKey.clickActionTC, 2)
     var clickActionTR = appCtx.getPrefInt(PreferKey.clickActionTR, 1)
@@ -25,7 +25,6 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
-            PreferKey.themeMode -> isEInkMode = appCtx.getPrefString(PreferKey.themeMode) == "3"
             PreferKey.clickActionTL -> clickActionTL =
                 appCtx.getPrefInt(PreferKey.clickActionTL, 2)
             PreferKey.clickActionTC -> clickActionTC =
@@ -52,26 +51,10 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
         }
     }
 
-    fun isNightTheme(context: Context): Boolean {
-        return when (context.getPrefString(PreferKey.themeMode, "0")) {
-            "1" -> false
-            "2" -> true
-            "3" -> false
-            else -> context.sysIsDarkMode()
-        }
-    }
+    fun isNightTheme(@Suppress("UNUSED_PARAMETER") context: Context): Boolean = false
 
-    var isNightTheme: Boolean
-        get() = isNightTheme(appCtx)
-        set(value) {
-            if (isNightTheme != value) {
-                if (value) {
-                    appCtx.putPrefString(PreferKey.themeMode, "2")
-                } else {
-                    appCtx.putPrefString(PreferKey.themeMode, "1")
-                }
-            }
-        }
+    val isNightTheme: Boolean
+        get() = false
 
     var showUnread: Boolean
         get() = appCtx.getPrefBoolean(PreferKey.showUnread, true)
@@ -80,18 +63,8 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
         }
 
     var readBrightness: Int
-        get() = if (isNightTheme) {
-            appCtx.getPrefInt(PreferKey.nightBrightness, 100)
-        } else {
-            appCtx.getPrefInt(PreferKey.brightness, 100)
-        }
-        set(value) {
-            if (isNightTheme) {
-                appCtx.putPrefInt(PreferKey.nightBrightness, value)
-            } else {
-                appCtx.putPrefInt(PreferKey.brightness, value)
-            }
-        }
+        get() = appCtx.getPrefInt(PreferKey.brightness, 100)
+        set(value) = appCtx.putPrefInt(PreferKey.brightness, value)
 
     val useDefaultCover: Boolean
         get() = appCtx.getPrefBoolean(PreferKey.useDefaultCover, false)
@@ -143,25 +116,9 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
         get() = appCtx.getPrefBoolean(PreferKey.autoRefresh)
 
     var threadCount: Int
-        get() = appCtx.getPrefInt(PreferKey.threadCount, 16)
+        get() = appCtx.getPrefInt(PreferKey.threadCount, 4)
         set(value) {
             appCtx.putPrefInt(PreferKey.threadCount, value)
-        }
-
-    var importBookPath: String?
-        get() = appCtx.getPrefString("importBookPath")
-        set(value) {
-            if (value == null) {
-                appCtx.removePref("importBookPath")
-            } else {
-                appCtx.putPrefString("importBookPath", value)
-            }
-        }
-
-    var ttsSpeechRate: Int
-        get() = appCtx.getPrefInt(PreferKey.ttsSpeechRate, 5)
-        set(value) {
-            appCtx.putPrefInt(PreferKey.ttsSpeechRate, value)
         }
 
     var chineseConverterType: Int
@@ -228,12 +185,6 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
             appCtx.putPrefBoolean(PreferKey.changeSourceCheckAuthor, value)
         }
 
-    var ttsEngine: String?
-        get() = appCtx.getPrefString(PreferKey.ttsEngine)
-        set(value) {
-            appCtx.putPrefString(PreferKey.ttsEngine, value)
-        }
-
     val autoChangeSource: Boolean
         get() = appCtx.getPrefBoolean(PreferKey.autoChangeSource, true)
 
@@ -251,7 +202,6 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
             appCtx.putPrefInt(PreferKey.preDownloadNum, value)
         }
 
-    val mediaButtonOnExit get() = appCtx.getPrefBoolean("mediaButtonOnExit", true)
 
     val replaceEnableDefault get() = appCtx.getPrefBoolean(PreferKey.replaceEnableDefault, true)
 

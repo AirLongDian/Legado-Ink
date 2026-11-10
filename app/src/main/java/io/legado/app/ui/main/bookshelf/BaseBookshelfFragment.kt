@@ -1,8 +1,11 @@
 package io.legado.app.ui.main.bookshelf
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import io.legado.app.R
@@ -15,11 +18,10 @@ import io.legado.app.databinding.DialogEditTextBinding
 import io.legado.app.help.AppConfig
 import io.legado.app.help.DirectLinkUpload
 import io.legado.app.lib.dialogs.alert
-import io.legado.app.ui.about.AppLogDialog
+import io.legado.app.ui.log.AppLogDialog
 import io.legado.app.ui.book.arrange.ArrangeBookActivity
 import io.legado.app.ui.book.cache.CacheActivity
 import io.legado.app.ui.book.group.GroupManageDialog
-import io.legado.app.ui.book.local.ImportBookActivity
 import io.legado.app.ui.book.search.SearchActivity
 import io.legado.app.ui.document.HandleFileContract
 import io.legado.app.ui.main.MainViewModel
@@ -29,6 +31,27 @@ abstract class BaseBookshelfFragment(layoutId: Int) : VMBaseFragment<BookshelfVi
 
     val activityViewModel by activityViewModels<MainViewModel>()
     override val viewModel by viewModels<BookshelfViewModel>()
+
+    private val importLocalBooks = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        if (uris.isNotEmpty()) {
+            uris.forEach { uri ->
+                runCatching {
+                    requireContext().contentResolver.takePersistableUriPermission(
+                        uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                }
+            }
+            val bookUris = uris.filter { uri ->
+                val name = DocumentFile.fromSingleUri(requireContext(), uri)?.name.orEmpty()
+                name.endsWith(".txt", true) || name.endsWith(".epub", true) || name.endsWith(".umd", true)
+            }
+            if (bookUris.isEmpty()) {
+                toastOnUi(R.string.empty_msg_import_book)
+            } else {
+                viewModel.importLocalBooks(bookUris)
+            }
+        }
+    }
 
     private val importBookshelf = registerForActivityResult(HandleFileContract()) {
         kotlin.runCatching {
@@ -74,7 +97,7 @@ abstract class BaseBookshelfFragment(layoutId: Int) : VMBaseFragment<BookshelfVi
             R.id.menu_update_toc -> activityViewModel.upToc(books)
             R.id.menu_bookshelf_layout -> configBookshelf()
             R.id.menu_group_manage -> showDialogFragment<GroupManageDialog>()
-            R.id.menu_add_local -> startActivity<ImportBookActivity>()
+            R.id.menu_add_local -> importLocalBooks.launch(arrayOf("*/*"))
             R.id.menu_add_url -> addBookByUrl()
             R.id.menu_arrange_bookshelf -> startActivity<ArrangeBookActivity> {
                 putExtra("groupId", groupId)

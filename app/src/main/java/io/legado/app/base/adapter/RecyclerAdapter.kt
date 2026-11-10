@@ -31,7 +31,6 @@ abstract class RecyclerAdapter<ITEM, VB : ViewBinding>(protected val context: Co
     private var itemClickListener: ((holder: ItemViewHolder, item: ITEM) -> Unit)? = null
     private var itemLongClickListener: ((holder: ItemViewHolder, item: ITEM) -> Boolean)? = null
 
-    var itemAnimation: ItemAnimation? = null
 
     fun setOnItemClickListener(listener: (holder: ItemViewHolder, item: ITEM) -> Unit) {
         itemClickListener = listener
@@ -385,13 +384,6 @@ abstract class RecyclerAdapter<ITEM, VB : ViewBinding>(protected val context: Co
         }
     }
 
-    override fun onViewAttachedToWindow(holder: ItemViewHolder) {
-        super.onViewAttachedToWindow(holder)
-        if (!isHeader(holder.layoutPosition) && !isFooter(holder.layoutPosition)) {
-            addAnimation(holder)
-        }
-    }
-
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         val manager = recyclerView.layoutManager
@@ -409,26 +401,6 @@ abstract class RecyclerAdapter<ITEM, VB : ViewBinding>(protected val context: Co
     private fun isFooter(position: Int) = position >= getActualItemCount() + getHeaderCount()
 
     private fun getActualPosition(position: Int) = position - getHeaderCount()
-
-    private fun addAnimation(holder: ItemViewHolder) {
-        itemAnimation?.let {
-            if (it.itemAnimEnabled) {
-                if (!it.itemAnimFirstOnly || holder.layoutPosition > it.itemAnimStartPosition) {
-                    startAnimation(holder, it)
-                    it.itemAnimStartPosition = holder.layoutPosition
-                }
-            }
-        }
-    }
-
-    protected open fun startAnimation(holder: ItemViewHolder, item: ItemAnimation) {
-        item.itemAnimation?.let {
-            for (anim in it.getAnimators(holder.itemView)) {
-                anim.setDuration(item.itemAnimDuration).start()
-                anim.interpolator = item.itemAnimInterpolator
-            }
-        }
-    }
 
     /**
      * 如果使用了事件回调,回调里不要直接使用item,会出现不更新的问题,

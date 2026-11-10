@@ -7,11 +7,7 @@ enum class Theme {
     Dark, Light, Auto, Transparent, EInk;
 
     companion object {
-        fun getTheme() = when {
-            AppConfig.isEInkMode -> EInk
-            AppConfig.isNightTheme -> Dark
-            else -> Light
-        }
+        fun getTheme() = EInk
 
         @Suppress("unused")
         fun fromBackground(backgroundColor: Int) =

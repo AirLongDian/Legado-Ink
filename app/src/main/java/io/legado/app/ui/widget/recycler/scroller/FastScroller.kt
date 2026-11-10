@@ -1,7 +1,5 @@
 package io.legado.app.ui.widget.recycler.scroller
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
@@ -10,7 +8,6 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewPropertyAnimator
 import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.annotation.IdRes
@@ -47,8 +44,6 @@ class FastScroller : LinearLayout {
     private var mFadeScrollbar: Boolean = false
     private var mShowBubble: Boolean = false
     private var mSectionIndexer: SectionIndexer? = null
-    private var mScrollbarAnimator: ViewPropertyAnimator? = null
-    private var mBubbleAnimator: ViewPropertyAnimator? = null
     private var mRecyclerView: RecyclerView? = null
     private lateinit var mBubbleView: TextView
     private lateinit var mHandleView: ImageView
@@ -73,7 +68,6 @@ class FastScroller : LinearLayout {
                 when (newState) {
                     RecyclerView.SCROLL_STATE_DRAGGING -> {
                         handler.removeCallbacks(mScrollbarHider)
-                        cancelAnimation(mScrollbarAnimator)
                         if (!isViewVisible(mScrollbar)) {
                             showScrollbar()
                         }
@@ -301,8 +295,6 @@ class FastScroller : LinearLayout {
                 requestDisallowInterceptTouchEvent(true)
                 setHandleSelected(true)
                 handler.removeCallbacks(mScrollbarHider)
-                cancelAnimation(mScrollbarAnimator)
-                cancelAnimation(mBubbleAnimator)
                 if (mShowBubble && mSectionIndexer != null) {
                     showBubble()
                 }
@@ -415,78 +407,27 @@ class FastScroller : LinearLayout {
         return view != null && view.visibility == View.VISIBLE
     }
 
-    private fun cancelAnimation(animator: ViewPropertyAnimator?) {
-        animator?.cancel()
-    }
-
     private fun showBubble() {
-        if (!isViewVisible(mBubbleView)) {
-            mBubbleView.visibility = View.VISIBLE
-            mBubbleAnimator = mBubbleView.animate().alpha(1f)
-                .setDuration(sBubbleAnimDuration.toLong())
-                .setListener(object : AnimatorListenerAdapter() {
-
-                    // adapter required for new alpha value to stick
-                })
-        }
+        mBubbleView.alpha = 1f
+        mBubbleView.visibility = View.VISIBLE
     }
 
     private fun hideBubble() {
-        if (isViewVisible(mBubbleView)) {
-            mBubbleAnimator = mBubbleView.animate().alpha(0f)
-                .setDuration(sBubbleAnimDuration.toLong())
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        super.onAnimationEnd(animation)
-                        mBubbleView.visibility = View.INVISIBLE
-                        mBubbleAnimator = null
-                    }
-
-                    override fun onAnimationCancel(animation: Animator) {
-                        super.onAnimationCancel(animation)
-                        mBubbleView.visibility = View.INVISIBLE
-                        mBubbleAnimator = null
-                    }
-                })
-        }
+        mBubbleView.visibility = View.INVISIBLE
     }
 
     private fun showScrollbar() {
-        mRecyclerView?.let { mRecyclerView ->
-            if (mRecyclerView.computeVerticalScrollRange() - mViewHeight > 0) {
-                val transX =
-                    resources.getDimensionPixelSize(R.dimen.fastscroll_scrollbar_padding_end)
-                        .toFloat()
-                mScrollbar.translationX = transX
+        mRecyclerView?.let { recyclerView ->
+            if (recyclerView.computeVerticalScrollRange() - mViewHeight > 0) {
+                mScrollbar.translationX = 0f
+                mScrollbar.alpha = 1f
                 mScrollbar.visibility = View.VISIBLE
-                mScrollbarAnimator = mScrollbar.animate().translationX(0f).alpha(1f)
-                    .setDuration(sScrollbarAnimDuration.toLong())
-                    .setListener(object : AnimatorListenerAdapter() {
-
-                        // adapter required for new alpha value to stick
-                    })
             }
         }
     }
 
     private fun hideScrollbar() {
-        val transX =
-            resources.getDimensionPixelSize(R.dimen.fastscroll_scrollbar_padding_end).toFloat()
-        mScrollbarAnimator = mScrollbar.animate().translationX(transX).alpha(0f)
-            .setDuration(sScrollbarAnimDuration.toLong())
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    super.onAnimationEnd(animation)
-                    mScrollbar.visibility = View.INVISIBLE
-                    mScrollbarAnimator = null
-                }
-
-                override fun onAnimationCancel(animation: Animator) {
-                    super.onAnimationCancel(animation)
-                    mScrollbar.visibility = View.INVISIBLE
-                    mScrollbarAnimator = null
-                }
-            })
+        mScrollbar.visibility = View.INVISIBLE
     }
 
     private fun setHandleSelected(selected: Boolean) {

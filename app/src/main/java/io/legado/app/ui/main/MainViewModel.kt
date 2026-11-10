@@ -188,21 +188,8 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
         }
     }
 
-    fun postLoad() {
-        execute {
-            if (appDb.httpTTSDao.count == 0) {
-                DefaultData.httpTTS.let {
-                    appDb.httpTTSDao.insert(*it.toTypedArray())
-                }
-            }
-        }
-    }
-
     fun upVersion() {
         execute {
-            if (LocalConfig.needUpHttpTTS) {
-                DefaultData.importDefaultHttpTTS()
-            }
             if (LocalConfig.needUpTxtTocRule) {
                 DefaultData.importDefaultTocRules()
             }

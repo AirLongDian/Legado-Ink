@@ -3,10 +3,9 @@
 package io.legado.app.ui.widget.code
 
 import android.content.Context
+import android.graphics.Color
 import android.widget.ArrayAdapter
 import io.legado.app.R
-import splitties.init.appCtx
-import splitties.resources.color
 import java.util.regex.Pattern
 
 val legadoPattern: Pattern = Pattern.compile("\\|\\||&&|%%|@js:|@Json:|@css:|@@|@XPath:")
@@ -17,17 +16,17 @@ val operationPattern: Pattern =
 val jsPattern: Pattern = Pattern.compile("var")
 
 fun CodeView.addLegadoPattern() {
-    addSyntaxPattern(legadoPattern, appCtx.color(R.color.md_orange_900))
+    addSyntaxPattern(legadoPattern, Color.BLACK)
 }
 
 fun CodeView.addJsonPattern() {
-    addSyntaxPattern(jsonPattern, appCtx.color(R.color.md_blue_800))
+    addSyntaxPattern(jsonPattern, Color.DKGRAY)
 }
 
 fun CodeView.addJsPattern() {
-    addSyntaxPattern(wrapPattern, appCtx.color(R.color.md_blue_grey_500))
-    addSyntaxPattern(operationPattern, appCtx.color(R.color.md_orange_900))
-    addSyntaxPattern(jsPattern, appCtx.color(R.color.md_light_blue_600))
+    addSyntaxPattern(wrapPattern, Color.GRAY)
+    addSyntaxPattern(operationPattern, Color.BLACK)
+    addSyntaxPattern(jsPattern, Color.DKGRAY)
 }
 
 fun Context.arrayAdapter(keywords: Array<String>): ArrayAdapter<String> {

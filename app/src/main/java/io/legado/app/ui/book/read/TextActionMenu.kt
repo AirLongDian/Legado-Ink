@@ -7,8 +7,6 @@ import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
-import android.speech.tts.TextToSpeech
-import android.speech.tts.UtteranceProgressListener
 import android.view.*
 import android.widget.PopupWindow
 import androidx.annotation.RequiresApi
@@ -22,29 +20,24 @@ import io.legado.app.base.adapter.RecyclerAdapter
 import io.legado.app.constant.PreferKey
 import io.legado.app.databinding.ItemTextBinding
 import io.legado.app.databinding.PopupActionMenuBinding
-import io.legado.app.service.BaseReadAloudService
 import io.legado.app.utils.*
 import timber.log.Timber
-import java.util.*
 
 @SuppressLint("RestrictedApi")
 class TextActionMenu(private val context: Context, private val callBack: CallBack) :
-    PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT),
-    TextToSpeech.OnInitListener {
+    PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT) {
 
     private val binding = PopupActionMenuBinding.inflate(LayoutInflater.from(context))
     private val adapter = Adapter(context)
     private val menuItems: List<MenuItemImpl>
     private val visibleMenuItems = arrayListOf<MenuItemImpl>()
     private val moreMenuItems = arrayListOf<MenuItemImpl>()
-    private val ttsListener by lazy {
-        TTSUtteranceListener()
-    }
     private val expandTextMenu get() = context.getPrefBoolean(PreferKey.expandTextMenu)
 
     init {
         @SuppressLint("InflateParams")
         contentView = binding.root
+        animationStyle = 0
 
         isTouchable = true
         isOutsideTouchable = false
@@ -190,13 +183,6 @@ class TextActionMenu(private val context: Context, private val callBack: CallBac
         when (item.itemId) {
             R.id.menu_copy -> context.sendToClip(callBack.selectedText)
             R.id.menu_share_str -> context.share(callBack.selectedText)
-            R.id.menu_aloud -> {
-                if (BaseReadAloudService.isRun) {
-                    context.toastOnUi(R.string.alouding_disable)
-                    return
-                }
-                readAloud(callBack.selectedText)
-            }
             R.id.menu_browser -> {
                 kotlin.runCatching {
                     val intent = if (callBack.selectedText.isAbsUrl()) {
@@ -220,39 +206,6 @@ class TextActionMenu(private val context: Context, private val callBack: CallBac
                     context.startActivity(it)
                 }
             }
-        }
-    }
-
-    private var textToSpeech: TextToSpeech? = null
-    private var ttsInitFinish = false
-    private var lastText: String = ""
-
-    @SuppressLint("SetJavaScriptEnabled")
-    private fun readAloud(text: String) {
-        lastText = text
-        if (textToSpeech == null) {
-            textToSpeech = TextToSpeech(context, this).apply {
-                setOnUtteranceProgressListener(ttsListener)
-            }
-            return
-        }
-        if (!ttsInitFinish) return
-        if (text == "") return
-        if (textToSpeech?.isSpeaking == true) {
-            textToSpeech?.stop()
-        }
-        textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, null, "select_text")
-        lastText = ""
-    }
-
-    @Synchronized
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            textToSpeech?.language = Locale.CHINA
-            ttsInitFinish = true
-            readAloud(lastText)
-        } else {
-            context.toastOnUi(R.string.tts_init_failed)
         }
     }
 
@@ -293,22 +246,6 @@ class TextActionMenu(private val context: Context, private val callBack: CallBac
             }
         }.onFailure {
             context.toastOnUi("获取文字操作菜单出错:${it.localizedMessage}")
-        }
-    }
-
-    private inner class TTSUtteranceListener : UtteranceProgressListener() {
-
-        override fun onStart(utteranceId: String?) {
-
-        }
-
-        override fun onDone(utteranceId: String?) {
-            textToSpeech?.shutdown()
-            textToSpeech = null
-        }
-
-        override fun onError(utteranceId: String?) {
-
         }
     }
 

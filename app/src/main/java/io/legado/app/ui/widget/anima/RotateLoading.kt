@@ -1,7 +1,5 @@
 package io.legado.app.ui.widget.anima
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -116,47 +114,9 @@ class RotateLoading @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        if (!isStarted) {
-            return
-        }
-
-        mPaint.color = Color.parseColor("#1a000000")
-        shadowRectF?.let {
-            canvas.drawArc(it, topDegree.toFloat(), arc, false, mPaint)
-            canvas.drawArc(it, bottomDegree.toFloat(), arc, false, mPaint)
-        }
-
+        if (!isStarted) return
         mPaint.color = loadingColor
-        loadingRectF?.let {
-            canvas.drawArc(it, topDegree.toFloat(), arc, false, mPaint)
-            canvas.drawArc(it, bottomDegree.toFloat(), arc, false, mPaint)
-        }
-
-        topDegree += speedOfDegree
-        bottomDegree += speedOfDegree
-        if (topDegree > 360) {
-            topDegree -= 360
-        }
-        if (bottomDegree > 360) {
-            bottomDegree -= 360
-        }
-
-        if (changeBigger) {
-            if (arc < 160) {
-                arc += speedOfArc
-                invalidate()
-            }
-        } else {
-            if (arc > speedOfDegree) {
-                arc -= 2 * speedOfArc
-                invalidate()
-            }
-        }
-        if (arc >= 160 || arc <= 10) {
-            changeBigger = !changeBigger
-            invalidate()
-        }
+        loadingRectF?.let { canvas.drawArc(it, 25f, 260f, false, mPaint) }
     }
 
     override fun onAttachedToWindow() {
@@ -169,7 +129,6 @@ class RotateLoading @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         isStarted = false
-        animate().cancel()
         removeCallbacks(shown)
         removeCallbacks(hidden)
     }
@@ -198,21 +157,12 @@ class RotateLoading @JvmOverloads constructor(
     }
 
     private fun startAnimator() {
-        animate().cancel()
-        animate().scaleX(1.0f)
-            .scaleY(1.0f)
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animation: Animator) {
-                    visibility = VISIBLE
-                }
-            })
-            .start()
+        visibility = VISIBLE
     }
 
     private fun stopAnimator() {
-        animate().cancel()
         isStarted = false
-        this.visibility = hideMode
+        visibility = hideMode
     }
 
     companion object {

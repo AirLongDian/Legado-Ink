@@ -154,22 +154,6 @@ data class Book(
         return config().useReplaceRule
     }
 
-    fun getReSegment(): Boolean {
-        return config().reSegment
-    }
-
-    fun setReSegment(reSegment: Boolean) {
-        config().reSegment = reSegment
-    }
-
-    fun getPageAnim(): Int {
-        return config().pageAnim
-    }
-
-    fun setPageAnim(pageAnim: Int) {
-        config().pageAnim = pageAnim
-    }
-
     fun getImageStyle(): String? {
         return config().imageStyle
     }
@@ -276,8 +260,6 @@ data class Book(
     @Parcelize
     data class ReadConfig(
         var reverseToc: Boolean = false,
-        var pageAnim: Int = -1,
-        var reSegment: Boolean = false,
         var imageStyle: String? = null,
         var useReplaceRule: Boolean = AppConfig.replaceEnableDefault,// 正文使用净化替换规则
         var delTag: Long = 0L,//去除标签

@@ -1,17 +1,11 @@
 package io.legado.app.model
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
-import com.bumptech.glide.RequestBuilder
-import com.bumptech.glide.request.RequestOptions
 import io.legado.app.R
 import io.legado.app.constant.PreferKey
-import io.legado.app.help.AppConfig
-import io.legado.app.help.BlurTransformation
-import io.legado.app.help.glide.ImageLoader
 import io.legado.app.utils.BitmapUtils
 import io.legado.app.utils.getPrefBoolean
 import io.legado.app.utils.getPrefString
@@ -32,19 +26,9 @@ object BookCover {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     fun upDefaultCover() {
-        val isNightTheme = AppConfig.isNightTheme
-        drawBookName = if (isNightTheme) {
-            appCtx.getPrefBoolean(PreferKey.coverShowNameN, true)
-        } else {
-            appCtx.getPrefBoolean(PreferKey.coverShowName, true)
-        }
-        drawBookAuthor = if (isNightTheme) {
-            appCtx.getPrefBoolean(PreferKey.coverShowAuthorN, true)
-        } else {
-            appCtx.getPrefBoolean(PreferKey.coverShowAuthor, true)
-        }
-        val key = if (isNightTheme) PreferKey.defaultCoverDark else PreferKey.defaultCover
-        val path = appCtx.getPrefString(key)
+        drawBookName = appCtx.getPrefBoolean(PreferKey.coverShowName, true)
+        drawBookAuthor = appCtx.getPrefBoolean(PreferKey.coverShowAuthor, true)
+        val path = appCtx.getPrefString(PreferKey.defaultCover)
         if (path.isNullOrBlank()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 defaultDrawable = appCtx.resources.getDrawable(R.drawable.image_cover_default, null)
@@ -62,11 +46,6 @@ object BookCover {
                 BitmapDrawable(appCtx.resources, BitmapUtils.decodeBitmap(path, 600, 900))
             }.getOrDefault(appCtx.resources.getDrawable(R.drawable.image_cover_default))
         }
-    }
-
-    fun getBlurDefaultCover(context: Context): RequestBuilder<Drawable> {
-        return ImageLoader.load(context, defaultDrawable)
-            .apply(RequestOptions.bitmapTransform(BlurTransformation(context, 25)))
     }
 
 }

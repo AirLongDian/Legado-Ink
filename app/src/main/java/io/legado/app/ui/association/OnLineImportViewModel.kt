@@ -5,10 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import io.legado.app.R
 import io.legado.app.base.BaseViewModel
 import io.legado.app.data.appDb
-import io.legado.app.data.entities.HttpTTS
 import io.legado.app.data.entities.TxtTocRule
-import io.legado.app.help.ReadBookConfig
-import io.legado.app.help.ThemeConfig
 import io.legado.app.help.http.newCallResponseBody
 import io.legado.app.help.http.okHttpClient
 import io.legado.app.help.http.text
@@ -73,71 +70,6 @@ class OnLineImportViewModel(app: Application) : BaseViewModel(app) {
         }
     }
 
-    fun importHttpTTS(json: String, finally: (title: String, msg: String) -> Unit) {
-        execute {
-            if (json.isJsonArray()) {
-                HttpTTS.fromJsonArray(json).let {
-                    appDb.httpTTSDao.insert(*it.toTypedArray())
-                    return@execute it.size
-                }
-            } else {
-                HttpTTS.fromJson(json)?.let {
-                    appDb.httpTTSDao.insert(it)
-                    return@execute 1
-                } ?: throw NoStackTraceException("格式不对")
-            }
-        }.onSuccess {
-            finally.invoke(context.getString(R.string.success), "导入${it}朗读引擎")
-        }.onError {
-            finally.invoke(
-                context.getString(R.string.error),
-                it.localizedMessage ?: context.getString(R.string.unknown_error)
-            )
-        }
-    }
-
-    fun importTheme(json: String, finally: (title: String, msg: String) -> Unit) {
-        execute {
-            if (json.isJsonArray()) {
-                GSON.fromJsonArray<ThemeConfig.Config>(json)?.forEach {
-                    ThemeConfig.addConfig(it)
-                } ?: throw NoStackTraceException("格式不对")
-            } else {
-                GSON.fromJsonObject<ThemeConfig.Config>(json)?.let {
-                    ThemeConfig.addConfig(it)
-                } ?: throw NoStackTraceException("格式不对")
-            }
-        }.onSuccess {
-            finally.invoke(context.getString(R.string.success), "导入主题成功")
-        }.onError {
-            finally.invoke(
-                context.getString(R.string.error),
-                it.localizedMessage ?: context.getString(R.string.unknown_error)
-            )
-        }
-    }
-
-    fun importReadConfig(bytes: ByteArray, finally: (title: String, msg: String) -> Unit) {
-        execute {
-            val config = ReadBookConfig.import(bytes)
-            ReadBookConfig.configList.forEachIndexed { index, c ->
-                if (c.name == config.name) {
-                    ReadBookConfig.configList[index] = config
-                    return@execute config.name
-                }
-                ReadBookConfig.configList.add(config)
-                return@execute config.name
-            }
-        }.onSuccess {
-            finally.invoke(context.getString(R.string.success), "导入排版成功")
-        }.onError {
-            finally.invoke(
-                context.getString(R.string.error),
-                it.localizedMessage ?: context.getString(R.string.unknown_error)
-            )
-        }
-    }
-
     fun determineType(url: String, finally: (title: String, msg: String) -> Unit) {
         execute {
             val rs = okHttpClient.newCallResponseBody {
@@ -148,8 +80,7 @@ class OnLineImportViewModel(app: Application) : BaseViewModel(app) {
                 MediaType.parse("application/zip"),
 //                "application/octet-stream".toMediaType() -> {
                 MediaType.parse("application/octet-stream") -> {
-                    @Suppress("BlockingMethodInNonBlockingContext")
-                    importReadConfig(rs.bytes(), finally)
+                    errorLive.postValue("墨水屏版不导入阅读预设")
                 }
                 else -> {
                     val json = rs.text("utf-8")
@@ -160,8 +91,6 @@ class OnLineImportViewModel(app: Application) : BaseViewModel(app) {
                             successLive.postValue(Pair("rssSource", json))
                         json.contains("replacement") ->
                             successLive.postValue(Pair("replaceRule", json))
-                        json.contains("themeName") ->
-                            importTextTocRule(json, finally)
                         json.contains("name") && json.contains("rule") ->
                             importTextTocRule(json, finally)
                         json.contains("name") && json.contains("url") ->

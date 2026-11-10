@@ -13,7 +13,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <androidx.recyclerview.widget.RecyclerView
+        <io.legado.app.ui.widget.recycler.InkRecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <io.legado.app.ui.widget.recycler.InkRecyclerView
         android:id="@+id/recycler_view_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

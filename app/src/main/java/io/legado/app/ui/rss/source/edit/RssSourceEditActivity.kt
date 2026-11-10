@@ -10,7 +10,6 @@ import android.view.ViewTreeObserver
 import android.widget.EditText
 import android.widget.PopupWindow
 import androidx.activity.viewModels
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import io.legado.app.R
 import io.legado.app.base.VMBaseActivity
 import io.legado.app.constant.AppConst
@@ -23,7 +22,6 @@ import io.legado.app.lib.theme.primaryColor
 import io.legado.app.ui.login.SourceLoginActivity
 import io.legado.app.ui.rss.source.debug.RssSourceDebugActivity
 import io.legado.app.ui.widget.KeyboardToolPop
-import io.legado.app.ui.widget.dialog.TextDialog
 import io.legado.app.utils.*
 import io.legado.app.utils.viewbindingdelegate.viewBinding
 import kotlin.math.abs
@@ -49,9 +47,6 @@ class RssSourceEditActivity :
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        if (!LocalConfig.ruleHelpVersionIsLast) {
-            showRuleHelp()
-        }
     }
 
     override fun finish() {
@@ -119,12 +114,6 @@ class RssSourceEditActivity :
             R.id.menu_copy_source -> sendToClip(GSON.toJson(getRssSource()))
             R.id.menu_paste_source -> viewModel.pasteSource { upRecyclerView(it) }
             R.id.menu_share_str -> share(GSON.toJson(getRssSource()))
-            R.id.menu_share_qr -> shareWithQr(
-                GSON.toJson(getRssSource()),
-                getString(R.string.share_rss_source),
-                ErrorCorrectionLevel.L
-            )
-            R.id.menu_help -> showRuleHelp()
         }
         return super.onCompatOptionsItemSelected(item)
     }
@@ -231,31 +220,10 @@ class RssSourceEditActivity :
 
     override fun sendText(text: String) {
         if (text == AppConst.keyboardToolChars[0]) {
-            showHelpDialog()
+            insertText(AppConst.urlOption)
         } else {
             insertText(text)
         }
-    }
-
-    private fun showHelpDialog() {
-        val items = arrayListOf("插入URL参数", "订阅源教程", "正则教程")
-        selector(getString(R.string.help), items) { _, index ->
-            when (index) {
-                0 -> insertText(AppConst.urlOption)
-                1 -> showRuleHelp()
-                2 -> showRegexHelp()
-            }
-        }
-    }
-
-    private fun showRuleHelp() {
-        val mdText = String(assets.open("help/ruleHelp.md").readBytes())
-        showDialogFragment(TextDialog(mdText, TextDialog.Mode.MD))
-    }
-
-    private fun showRegexHelp() {
-        val mdText = String(assets.open("help/regexHelp.md").readBytes())
-        showDialogFragment(TextDialog(mdText, TextDialog.Mode.MD))
     }
 
     private fun showKeyboardTopPopupWindow() {

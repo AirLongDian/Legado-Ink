@@ -59,9 +59,7 @@ class PageView(context: Context) : FrameLayout(context) {
     fun upStyle() = binding.run {
         upTipStyle()
         ReadBookConfig.let {
-            val tipColor = with(ReadTipConfig) {
-                if (tipColor == 0) it.textColor else tipColor
-            }
+            val tipColor = it.textColor
             bvHeaderLeft.setColor(tipColor)
             tvHeaderLeft.setColor(tipColor)
             tvHeaderMiddle.setColor(tipColor)
@@ -213,6 +211,10 @@ class PageView(context: Context) : FrameLayout(context) {
             resetPageOffset()
         }
         binding.contentTextView.setContent(textPage)
+    }
+
+    fun prepareAdjacentPageText() {
+        binding.contentTextView.prepareAdjacentPage()
     }
 
     fun setContentDescription(content: String) {

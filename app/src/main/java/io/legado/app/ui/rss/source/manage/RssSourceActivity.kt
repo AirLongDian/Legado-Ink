@@ -25,7 +25,6 @@ import io.legado.app.ui.association.ImportRssSourceDialog
 import io.legado.app.ui.document.HandleFileContract
 import io.legado.app.ui.rss.source.edit.RssSourceEditActivity
 import io.legado.app.ui.widget.SelectActionBar
-import io.legado.app.ui.widget.dialog.TextDialog
 import io.legado.app.ui.widget.recycler.DragSelectTouchHelper
 import io.legado.app.ui.widget.recycler.ItemTouchCallback
 import io.legado.app.ui.widget.recycler.VerticalDivider
@@ -113,7 +112,6 @@ class RssSourceActivity : VMBaseActivity<ActivityRssSourceBinding, RssSourceView
                 startActivity(Intent.createChooser(it, getString(R.string.share_selected_source)))
             }
             R.id.menu_import_default -> viewModel.importDefault()
-            R.id.menu_help -> showHelp()
             else -> if (item.groupId == R.id.source_group) {
                 binding.titleBar.findViewById<SearchView>(R.id.search_view)
                     .setQuery("group:${item.title}", true)
@@ -244,11 +242,6 @@ class RssSourceActivity : VMBaseActivity<ActivityRssSourceBinding, RssSourceView
                 adapter.setItems(it, adapter.diffItemCallback)
             }
         }
-    }
-
-    private fun showHelp() {
-        val text = String(assets.open("help/SourceMRssHelp.md").readBytes())
-        showDialogFragment(TextDialog(text, TextDialog.Mode.MD))
     }
 
     override fun upCountView() {

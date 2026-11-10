@@ -19,7 +19,6 @@ class SourceLoginViewModel(application: Application) : BaseViewModel(application
             when (intent.getStringExtra("type")) {
                 "bookSource" -> source = appDb.bookSourceDao.getBookSource(sourceKey)
                 "rssSource" -> source = appDb.rssSourceDao.getByKey(sourceKey)
-                "httpTts" -> source = appDb.httpTTSDao.get(sourceKey.toLong())
             }
             source
         }.onSuccess {

@@ -5,13 +5,8 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'de.timfreiheit.resourceplaceholders'
 apply from: 'download.gradle'
 
-static def releaseTime() {
-    return new Date().format("yy.MMddHH", TimeZone.getTimeZone("GMT+8"))
-}
-
-def name = "legado"
-def version = "3." + releaseTime()
-def gitCommits = Integer.parseInt('git rev-list --count HEAD'.execute([], project.rootDir).text.trim())
+def name = "Legado-Ink"
+def version = "1.0"
 
 android {
     compileSdkVersion 30
@@ -32,10 +27,10 @@ android {
         }
     }
     defaultConfig {
-        applicationId "io.legado.app"
+        applicationId "io.legado.ink"
         minSdkVersion 19
         targetSdkVersion 31
-        versionCode gitCommits
+        versionCode 1
         versionName version
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         project.ext.set("archivesBaseName", name + "_" + version)
@@ -60,7 +55,6 @@ android {
             if (project.hasProperty("RELEASE_STORE_FILE")) {
                 signingConfig signingConfigs.myConfig
             }
-            applicationIdSuffix '.release'
 
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -78,7 +72,9 @@ android {
         android.applicationVariants.all { variant ->
             variant.outputs.all {
                 def flavor = variant.productFlavors[0].name
-                outputFileName = "${name}_${flavor}_${defaultConfig.versionName}.apk"
+                def flavorSuffix = flavor == "app" ? "" : "-${flavor}"
+                def buildSuffix = variant.buildType.name == "debug" ? "-debug" : ""
+                outputFileName = "${name}${flavorSuffix}-v${defaultConfig.versionName}${buildSuffix}.apk"
             }
         }
     }
@@ -90,7 +86,7 @@ android {
         }
         google {
             dimension "mode"
-            applicationId "io.legado.play"
+            applicationId "io.legado.ink"
             manifestPlaceholders = [APP_CHANNEL_VALUE: "google"]
         }
     }
@@ -152,12 +148,6 @@ dependencies {
 
     implementation('com.jakewharton.timber:timber:5.0.1')
 
-    //media
-    implementation("androidx.media:media:1.4.1")
-    def exoplayer_version = '2.14.2'
-    implementation "com.google.android.exoplayer:exoplayer-core:$exoplayer_version"
-    implementation "com.google.android.exoplayer:extension-okhttp:$exoplayer_version"
-
     //Splitties
     def splitties_version = '3.0.0'
     implementation("com.louiscad.splitties:splitties-appctx:$splitties_version")
@@ -198,17 +188,6 @@ dependencies {
     //Glide
     implementation('com.github.bumptech.glide:glide:4.12.0')
     kapt('com.github.bumptech.glide:compiler:4.12.0')
-
-    //webServer
-    def nanoHttpdVersion = "2.3.1"
-    implementation("org.nanohttpd:nanohttpd:$nanoHttpdVersion")
-    implementation("org.nanohttpd:nanohttpd-websocket:$nanoHttpdVersion")
-
-    //二维码
-    implementation('com.king.zxing:zxing-lite:1.1.9-androidx')
-
-    //颜色选择
-    implementation('com.jaredrummler:colorpicker:1.1.0')
 
     //apache
     implementation('org.apache.commons:commons-text:1.9')

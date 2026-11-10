@@ -30,7 +30,6 @@ abstract class DiffRecyclerAdapter<ITEM, VB : ViewBinding>(protected val context
     private var itemClickListener: ((holder: ItemViewHolder, item: ITEM) -> Unit)? = null
     private var itemLongClickListener: ((holder: ItemViewHolder, item: ITEM) -> Boolean)? = null
 
-    var itemAnimation: ItemAnimation? = null
 
     abstract val diffItemCallback: DiffUtil.ItemCallback<ITEM>
 
@@ -160,11 +159,6 @@ abstract class DiffRecyclerAdapter<ITEM, VB : ViewBinding>(protected val context
         }
     }
 
-    override fun onViewAttachedToWindow(holder: ItemViewHolder) {
-        super.onViewAttachedToWindow(holder)
-        addAnimation(holder)
-    }
-
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         val manager = recyclerView.layoutManager
@@ -173,26 +167,6 @@ abstract class DiffRecyclerAdapter<ITEM, VB : ViewBinding>(protected val context
                 override fun getSpanSize(position: Int): Int {
                     return getSpanSize(getItemViewType(position), position)
                 }
-            }
-        }
-    }
-
-    private fun addAnimation(holder: ItemViewHolder) {
-        itemAnimation?.let {
-            if (it.itemAnimEnabled) {
-                if (!it.itemAnimFirstOnly || holder.layoutPosition > it.itemAnimStartPosition) {
-                    startAnimation(holder, it)
-                    it.itemAnimStartPosition = holder.layoutPosition
-                }
-            }
-        }
-    }
-
-    protected open fun startAnimation(holder: ItemViewHolder, item: ItemAnimation) {
-        item.itemAnimation?.let {
-            for (anim in it.getAnimators(holder.itemView)) {
-                anim.setDuration(item.itemAnimDuration).start()
-                anim.interpolator = item.itemAnimInterpolator
             }
         }
     }

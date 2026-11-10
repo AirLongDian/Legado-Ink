@@ -66,7 +66,7 @@ open class WelcomeActivity : BaseActivity<ActivityWelcomeBinding>() {
                 else -> null
             }
         }
-        binding.root.postDelayed({ startMainActivity() }, 500)
+        startMainActivity()
     }
 
     private fun startMainActivity() {
@@ -78,10 +78,3 @@ open class WelcomeActivity : BaseActivity<ActivityWelcomeBinding>() {
     }
 
 }
-
-class Launcher1 : WelcomeActivity()
-class Launcher2 : WelcomeActivity()
-class Launcher3 : WelcomeActivity()
-class Launcher4 : WelcomeActivity()
-class Launcher5 : WelcomeActivity()
-class Launcher6 : WelcomeActivity()

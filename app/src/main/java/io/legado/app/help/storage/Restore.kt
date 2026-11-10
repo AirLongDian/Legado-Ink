@@ -3,17 +3,13 @@ package io.legado.app.help.storage
 import android.content.Context
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
-import io.legado.app.BuildConfig
 import io.legado.app.R
-import io.legado.app.constant.AppConst.androidId
 import io.legado.app.constant.EventBus
 import io.legado.app.constant.PreferKey
 import io.legado.app.data.appDb
 import io.legado.app.data.entities.*
 import io.legado.app.help.DefaultData
-import io.legado.app.help.LauncherIconHelp
 import io.legado.app.help.ReadBookConfig
-import io.legado.app.help.ThemeConfig
 import io.legado.app.utils.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -35,7 +31,6 @@ object Restore {
     //忽略key
     val ignoreKeys = arrayOf(
         "readConfig",
-        PreferKey.themeMode,
         PreferKey.bookshelfLayout,
         PreferKey.showRss,
         PreferKey.threadCount
@@ -44,7 +39,6 @@ object Restore {
     //忽略标题
     val ignoreTitle = arrayOf(
         appCtx.getString(R.string.read_config),
-        appCtx.getString(R.string.theme_mode),
         appCtx.getString(R.string.bookshelf_layout),
         appCtx.getString(R.string.show_rss),
         appCtx.getString(R.string.thread_count)
@@ -52,18 +46,13 @@ object Restore {
 
     //默认忽略keys
     private val ignorePrefKeys = arrayOf(
-        PreferKey.themeMode,
-        PreferKey.defaultCover,
-        PreferKey.defaultCoverDark
+        PreferKey.defaultCover
     )
 
     //阅读配置
     private val readPrefKeys = arrayOf(
-        PreferKey.readStyleSelect,
-        PreferKey.shareLayout,
         PreferKey.hideStatusBar,
-        PreferKey.hideNavigationBar,
-        PreferKey.autoReadSpeed
+        PreferKey.hideNavigationBar
     )
 
     suspend fun restore(context: Context, path: String) {
@@ -114,11 +103,6 @@ object Restore {
             }
             fileToListT<BookSource>(path, "bookSource.json")?.let {
                 appDb.bookSourceDao.insert(*it.toTypedArray())
-            } ?: run {
-                val bookSourceFile =
-                    FileUtils.createFileIfNotExist(path + File.separator + "bookSource.json")
-                val json = bookSourceFile.readText()
-                ImportOldData.importOldSource(json)
             }
             fileToListT<RssSource>(path, "rssSources.json")?.let {
                 appDb.rssSourceDao.insert(*it.toTypedArray())
@@ -138,39 +122,11 @@ object Restore {
             fileToListT<TxtTocRule>(path, DefaultData.txtTocRuleFileName)?.let {
                 appDb.txtTocRuleDao.insert(*it.toTypedArray())
             }
-            fileToListT<HttpTTS>(path, DefaultData.httpTtsFileName)?.let {
-                appDb.httpTTSDao.insert(*it.toTypedArray())
-            }
-            fileToListT<ReadRecord>(path, "readRecord.json")?.let {
-                it.forEach { readRecord ->
-                    //判断是不是本机记录
-                    if (readRecord.deviceId != androidId) {
-                        appDb.readRecordDao.insert(readRecord)
-                    } else {
-                        val time = appDb.readRecordDao
-                            .getReadTime(readRecord.deviceId, readRecord.bookName)
-                        if (time == null || time < readRecord.readTime) {
-                            appDb.readRecordDao.insert(readRecord)
-                        }
-                    }
-                }
-            }
         }
     }
 
     suspend fun restoreConfig(path: String = Backup.backupPath) {
         withContext(IO) {
-            try {
-                val file =
-                    FileUtils.createFileIfNotExist("$path${File.separator}${ThemeConfig.configFileName}")
-                if (file.exists()) {
-                    FileUtils.deleteFile(ThemeConfig.configFilePath)
-                    file.copyTo(File(ThemeConfig.configFilePath))
-                    ThemeConfig.upConfig()
-                }
-            } catch (e: Exception) {
-                Timber.e(e)
-            }
             if (!ignoreReadConfig) {
                 //恢复阅读界面配置
                 try {
@@ -180,17 +136,6 @@ object Restore {
                         FileUtils.deleteFile(ReadBookConfig.configFilePath)
                         file.copyTo(File(ReadBookConfig.configFilePath))
                         ReadBookConfig.initConfigs()
-                    }
-                } catch (e: Exception) {
-                    Timber.e(e)
-                }
-                try {
-                    val file =
-                        FileUtils.createFileIfNotExist("$path${File.separator}${ReadBookConfig.shareConfigFileName}")
-                    if (file.exists()) {
-                        FileUtils.deleteFile(ReadBookConfig.shareConfigFilePath)
-                        file.copyTo(File(ReadBookConfig.shareConfigFilePath))
-                        ReadBookConfig.initShareConfig()
                     }
                 } catch (e: Exception) {
                     Timber.e(e)
@@ -212,19 +157,13 @@ object Restore {
                 edit.apply()
             }
             ReadBookConfig.apply {
-                styleSelect = appCtx.getPrefInt(PreferKey.readStyleSelect)
-                shareLayout = appCtx.getPrefBoolean(PreferKey.shareLayout)
                 hideStatusBar = appCtx.getPrefBoolean(PreferKey.hideStatusBar)
                 hideNavigationBar = appCtx.getPrefBoolean(PreferKey.hideNavigationBar)
-                autoReadSpeed = appCtx.getPrefInt(PreferKey.autoReadSpeed, 46)
             }
         }
         appCtx.toastOnUi(R.string.restore_success)
         withContext(Main) {
             delay(100)
-            if (!BuildConfig.DEBUG) {
-                LauncherIconHelp.changeIcon(appCtx.getPrefString(PreferKey.launcherIcon))
-            }
             postEvent(EventBus.RECREATE, "")
         }
     }
@@ -233,7 +172,6 @@ object Restore {
         return when {
             ignorePrefKeys.contains(key) -> false
             readPrefKeys.contains(key) && ignoreReadConfig -> false
-            PreferKey.themeMode == key && ignoreThemeMode -> false
             PreferKey.bookshelfLayout == key && ignoreBookshelfLayout -> false
             PreferKey.showRss == key && ignoreShowRss -> false
             PreferKey.threadCount == key && ignoreThreadCount -> false
@@ -243,8 +181,6 @@ object Restore {
 
     private val ignoreReadConfig: Boolean
         get() = ignoreConfig["readConfig"] == true
-    private val ignoreThemeMode: Boolean
-        get() = ignoreConfig[PreferKey.themeMode] == true
     private val ignoreBookshelfLayout: Boolean
         get() = ignoreConfig[PreferKey.bookshelfLayout] == true
     private val ignoreShowRss: Boolean

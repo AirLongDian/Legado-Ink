@@ -55,15 +55,6 @@ class OnLineImportActivity :
                 "/textTocRule" -> viewModel.getText(url) { json ->
                     viewModel.importTextTocRule(json, this::finallyDialog)
                 }
-                "/httpTTS" -> viewModel.getText(url) { json ->
-                    viewModel.importHttpTTS(json, this::finallyDialog)
-                }
-                "/theme" -> viewModel.getText(url) { json ->
-                    viewModel.importTheme(json, this::finallyDialog)
-                }
-                "/readConfig" -> viewModel.getBytes(url) { bytes ->
-                    viewModel.importReadConfig(bytes, this::finallyDialog)
-                }
                 "/importonline" -> when (it.host) {
                     "booksource" -> showDialogFragment(
                         ImportBookSourceDialog(url, true)

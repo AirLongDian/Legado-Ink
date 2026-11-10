@@ -77,12 +77,6 @@
             android:summary="@string/restore_ignore_summary"
             app:iconSpaceReserved="false" />
 
-        <io.legado.app.ui.widget.prefs.Preference
-            android:key="import_old"
-            android:title="@string/menu_import_old_version"
-            android:summary="@string/import_old_summary"
-            app:iconSpaceReserved="false" />
-
     </io.legado.app.ui.widget.prefs.PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

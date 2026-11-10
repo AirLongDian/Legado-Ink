@@ -25,14 +25,12 @@ import io.legado.app.help.LocalConfig
 import io.legado.app.help.storage.Backup
 import io.legado.app.lib.theme.elevation
 import io.legado.app.lib.theme.primaryColor
-import io.legado.app.service.BaseReadAloudService
 import io.legado.app.ui.main.bookshelf.BaseBookshelfFragment
 import io.legado.app.ui.main.bookshelf.style1.BookshelfFragment1
 import io.legado.app.ui.main.bookshelf.style2.BookshelfFragment2
 import io.legado.app.ui.main.explore.ExploreFragment
 import io.legado.app.ui.main.my.MyFragment
 import io.legado.app.ui.main.rss.RssFragment
-import io.legado.app.ui.widget.dialog.TextDialog
 import io.legado.app.utils.observeEvent
 import io.legado.app.utils.setEdgeEffectColor
 import io.legado.app.utils.showDialogFragment
@@ -77,9 +75,6 @@ class MainActivity : VMBaseActivity<ActivityMainBinding, MainViewModel>(),
                 viewModel.upAllBookToc()
             }, 1000)
         }
-        binding.viewPagerMain.postDelayed({
-            viewModel.postLoad()
-        }, 3000)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean = binding.run {
@@ -118,13 +113,6 @@ class MainActivity : VMBaseActivity<ActivityMainBinding, MainViewModel>(),
     private fun upVersion() {
         if (LocalConfig.versionCode != appInfo.versionCode) {
             LocalConfig.versionCode = appInfo.versionCode
-            if (LocalConfig.isFirstOpenApp) {
-                val text = String(assets.open("help/appHelp.md").readBytes())
-                showDialogFragment(TextDialog(text, TextDialog.Mode.MD))
-            } else if (!BuildConfig.DEBUG) {
-                val log = String(assets.open("updateLog.md").readBytes())
-                showDialogFragment(TextDialog(log, TextDialog.Mode.MD))
-            }
             viewModel.upVersion()
         }
     }
@@ -146,11 +134,7 @@ class MainActivity : VMBaseActivity<ActivityMainBinding, MainViewModel>(),
                         toastOnUi(R.string.double_click_exit)
                         exitTime = System.currentTimeMillis()
                     } else {
-                        if (BaseReadAloudService.pause) {
-                            finish()
-                        } else {
-                            moveTaskToBack(true)
-                        }
+                        finish()
                     }
                     return true
                 }

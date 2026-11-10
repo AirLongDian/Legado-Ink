@@ -16,9 +16,7 @@ class ConfigActivity : BaseActivity<ActivityConfigBinding>() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         when (val configTag = intent.getStringExtra("configTag")) {
             ConfigTag.OTHER_CONFIG -> replaceFragment<OtherConfigFragment>(configTag)
-            ConfigTag.THEME_CONFIG -> replaceFragment<ThemeConfigFragment>(configTag)
             ConfigTag.BACKUP_CONFIG -> replaceFragment<BackupConfigFragment>(configTag)
-            ConfigTag.COVER_CONFIG -> replaceFragment<CoverConfigFragment>(configTag)
             else -> finish()
         }
     }
@@ -41,14 +39,6 @@ class ConfigActivity : BaseActivity<ActivityConfigBinding>() {
         super.observeLiveBus()
         observeEvent<String>(EventBus.RECREATE) {
             recreate()
-        }
-    }
-
-    override fun finish() {
-        if (supportFragmentManager.findFragmentByTag(ConfigTag.COVER_CONFIG) != null) {
-            replaceFragment<ThemeConfigFragment>(ConfigTag.THEME_CONFIG)
-        } else {
-            super.finish()
         }
     }
 

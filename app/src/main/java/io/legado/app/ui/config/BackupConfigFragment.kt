@@ -4,9 +4,6 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.lifecycleScope
@@ -17,11 +14,9 @@ import io.legado.app.R
 import io.legado.app.base.BasePreferenceFragment
 import io.legado.app.constant.PreferKey
 import io.legado.app.help.AppConfig
-import io.legado.app.help.LocalConfig
 import io.legado.app.help.coroutine.Coroutine
 import io.legado.app.help.storage.AppWebDav
 import io.legado.app.help.storage.Backup
-import io.legado.app.help.storage.ImportOldData
 import io.legado.app.help.storage.Restore
 import io.legado.app.lib.dialogs.alert
 import io.legado.app.lib.permission.Permissions
@@ -29,7 +24,6 @@ import io.legado.app.lib.permission.PermissionsCompat
 import io.legado.app.lib.theme.accentColor
 import io.legado.app.lib.theme.primaryColor
 import io.legado.app.ui.document.HandleFileContract
-import io.legado.app.ui.widget.dialog.TextDialog
 import io.legado.app.utils.*
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -89,12 +83,6 @@ class BackupConfigFragment : BasePreferenceFragment(),
             }
         }
     }
-    private val restoreOld = registerForActivityResult(HandleFileContract()) {
-        it.uri?.let { uri ->
-            ImportOldData.importUri(appCtx, uri)
-        }
-    }
-
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_config_backup)
         findPreference<EditTextPreference>(PreferKey.webDavUrl)?.let {
@@ -128,28 +116,6 @@ class BackupConfigFragment : BasePreferenceFragment(),
         activity?.setTitle(R.string.backup_restore)
         preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         listView.setEdgeEffectColor(primaryColor)
-        setHasOptionsMenu(true)
-        if (!LocalConfig.backupHelpVersionIsLast) {
-            showHelp()
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.backup_restore, menu)
-        menu.applyTint(requireContext())
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_help -> showHelp()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun showHelp() {
-        val text = String(requireContext().assets.open("help/webDavHelp.md").readBytes())
-        showDialogFragment(TextDialog(text, TextDialog.Mode.MD))
     }
 
     override fun onDestroy() {
@@ -207,7 +173,6 @@ class BackupConfigFragment : BasePreferenceFragment(),
             PreferKey.restoreIgnore -> restoreIgnore()
             "web_dav_backup" -> backup()
             "web_dav_restore" -> restore()
-            "import_old" -> restoreOld.launch(null)
         }
         return super.onPreferenceTreeClick(preference)
     }

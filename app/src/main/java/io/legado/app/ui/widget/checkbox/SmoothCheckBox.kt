@@ -1,11 +1,9 @@
 package io.legado.app.ui.widget.checkbox
 
-import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.LinearInterpolator
 import android.widget.Checkable
 import io.legado.app.R
 import io.legado.app.lib.theme.ThemeStore
@@ -71,13 +69,6 @@ class SmoothCheckBox @JvmOverloads constructor(
         mTickPoints = arrayOf(Point(), Point(), Point())
         setOnClickListener {
             toggle()
-            mTickDrawing = false
-            mDrewDistance = 0f
-            if (isChecked) {
-                startCheckedAnimation()
-            } else {
-                startUnCheckedAnimation()
-            }
         }
     }
 
@@ -102,20 +93,8 @@ class SmoothCheckBox @JvmOverloads constructor(
      * @param checked checked
      * @param animate change with animation
      */
-    fun setChecked(checked: Boolean, animate: Boolean) {
-        if (animate) {
-            mTickDrawing = false
-            mChecked = checked
-            mDrewDistance = 0f
-            if (checked) {
-                startCheckedAnimation()
-            } else {
-                startUnCheckedAnimation()
-            }
-            onCheckedChangeListener?.invoke(this@SmoothCheckBox, mChecked)
-        } else {
-            this.isChecked = checked
-        }
+    fun setChecked(checked: Boolean, @Suppress("UNUSED_PARAMETER") animate: Boolean) {
+        this.isChecked = checked
     }
 
     private fun reset() {
@@ -205,103 +184,10 @@ class SmoothCheckBox @JvmOverloads constructor(
 
     private fun drawTickPath(canvas: Canvas) {
         mTickPath.reset()
-        // draw left of the tick
-        if (mDrewDistance < mLeftLineDistance) {
-            val step: Float = if (mWidth / 20.0f < 3) 3f else mWidth / 20.0f
-            mDrewDistance += step
-            val stopX =
-                mTickPoints[0].x + (mTickPoints[1].x - mTickPoints[0].x) * mDrewDistance / mLeftLineDistance
-            val stopY =
-                mTickPoints[0].y + (mTickPoints[1].y - mTickPoints[0].y) * mDrewDistance / mLeftLineDistance
-            mTickPath.moveTo(mTickPoints[0].x.toFloat(), mTickPoints[0].y.toFloat())
-            mTickPath.lineTo(stopX, stopY)
-            canvas.drawPath(mTickPath, mTickPaint)
-            if (mDrewDistance > mLeftLineDistance) {
-                mDrewDistance = mLeftLineDistance
-            }
-        } else {
-            mTickPath.moveTo(mTickPoints[0].x.toFloat(), mTickPoints[0].y.toFloat())
-            mTickPath.lineTo(mTickPoints[1].x.toFloat(), mTickPoints[1].y.toFloat())
-            canvas.drawPath(mTickPath, mTickPaint)
-            // draw right of the tick
-            if (mDrewDistance < mLeftLineDistance + mRightLineDistance) {
-                val stopX =
-                    mTickPoints[1].x + (mTickPoints[2].x - mTickPoints[1].x) * (mDrewDistance - mLeftLineDistance) / mRightLineDistance
-                val stopY =
-                    mTickPoints[1].y - (mTickPoints[1].y - mTickPoints[2].y) * (mDrewDistance - mLeftLineDistance) / mRightLineDistance
-                mTickPath.reset()
-                mTickPath.moveTo(mTickPoints[1].x.toFloat(), mTickPoints[1].y.toFloat())
-                mTickPath.lineTo(stopX, stopY)
-                canvas.drawPath(mTickPath, mTickPaint)
-                val step: Float = if (mWidth / 20f < 3) 3f else mWidth / 20f
-                mDrewDistance += step
-            } else {
-                mTickPath.reset()
-                mTickPath.moveTo(mTickPoints[1].x.toFloat(), mTickPoints[1].y.toFloat())
-                mTickPath.lineTo(mTickPoints[2].x.toFloat(), mTickPoints[2].y.toFloat())
-                canvas.drawPath(mTickPath, mTickPaint)
-            }
-        }
-        // invalidate
-        if (mDrewDistance < mLeftLineDistance + mRightLineDistance) {
-            postDelayed({ this.postInvalidate() }, 10)
-        }
-    }
-
-    private fun startCheckedAnimation() {
-        val animator = ValueAnimator.ofFloat(1.0f, 0f)
-        animator.duration = mAnimDuration / 3 * 2.toLong()
-        animator.interpolator = LinearInterpolator()
-        animator.addUpdateListener { animation: ValueAnimator ->
-            mScaleVal = animation.animatedValue as Float
-            mFloorColor = getGradientColor(
-                mUnCheckedColor,
-                mCheckedColor,
-                1 - mScaleVal
-            )
-            postInvalidate()
-        }
-        animator.start()
-        val floorAnimator = ValueAnimator.ofFloat(1.0f, 0.8f, 1.0f)
-        floorAnimator.duration = mAnimDuration.toLong()
-        floorAnimator.interpolator = LinearInterpolator()
-        floorAnimator.addUpdateListener { animation: ValueAnimator ->
-            mFloorScale = animation.animatedValue as Float
-            postInvalidate()
-        }
-        floorAnimator.start()
-        drawTickDelayed()
-    }
-
-    private fun startUnCheckedAnimation() {
-        val animator = ValueAnimator.ofFloat(0f, 1.0f)
-        animator.duration = mAnimDuration.toLong()
-        animator.interpolator = LinearInterpolator()
-        animator.addUpdateListener { animation: ValueAnimator ->
-            mScaleVal = animation.animatedValue as Float
-            mFloorColor = getGradientColor(
-                mCheckedColor,
-                mFloorUnCheckedColor,
-                mScaleVal
-            )
-            postInvalidate()
-        }
-        animator.start()
-        val floorAnimator = ValueAnimator.ofFloat(1.0f, 0.8f, 1.0f)
-        floorAnimator.duration = mAnimDuration.toLong()
-        floorAnimator.interpolator = LinearInterpolator()
-        floorAnimator.addUpdateListener { animation: ValueAnimator ->
-            mFloorScale = animation.animatedValue as Float
-            postInvalidate()
-        }
-        floorAnimator.start()
-    }
-
-    private fun drawTickDelayed() {
-        postDelayed({
-            mTickDrawing = true
-            postInvalidate()
-        }, mAnimDuration.toLong())
+        mTickPath.moveTo(mTickPoints[0].x.toFloat(), mTickPoints[0].y.toFloat())
+        mTickPath.lineTo(mTickPoints[1].x.toFloat(), mTickPoints[1].y.toFloat())
+        mTickPath.lineTo(mTickPoints[2].x.toFloat(), mTickPoints[2].y.toFloat())
+        canvas.drawPath(mTickPath, mTickPaint)
     }
 
     companion object {

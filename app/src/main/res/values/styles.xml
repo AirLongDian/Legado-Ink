@@ -2,29 +2,31 @@
 
     //**************************************************************Theme******************************************************************************//
 
-    <!-- 亮色主题 -->
-    <style name="AppTheme.Light" parent="Base.AppTheme">
+    <style name="AppTheme.EInk" parent="Base.AppTheme">
         <item name="actionBarStyle">@style/AppTheme.AppBarOverlay.Light</item>
-    </style>
-
-    <!-- 暗色主题 -->
-    <style name="AppTheme.Dark" parent="Base.AppTheme">
-        <item name="actionBarStyle">@style/AppTheme.AppBarOverlay.Dark</item>
+        <item name="android:windowAnimationStyle">@style/AnimationEInkInstant</item>
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 
     <!-- 透明主题 -->
     <style name="AppTheme.Transparent" parent="Base.AppTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
-    </style>
-
-    <!-- Welcome主题 -->
-    <style name="AppTheme.Welcome" parent="Base.AppTheme">
-        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@style/AnimationEInkInstant</item>
     </style>
 
     <!-- Base application theme. -->
     <style name="Base.AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowAnimationStyle">@style/AnimationEInkInstant</item>
+        <item name="android:dialogTheme">@style/AppTheme.Dialog</item>
+        <item name="dialogTheme">@style/AppTheme.Dialog</item>
+        <item name="alertDialogTheme">@style/AppTheme.AlertDialog</item>
+        <item name="android:colorControlHighlight">@android:color/transparent</item>
+        <item name="colorControlHighlight">@android:color/transparent</item>
+        <item name="android:selectableItemBackground">@drawable/ink_press_feedback</item>
+        <item name="android:selectableItemBackgroundBorderless">@drawable/ink_press_feedback</item>
+        <item name="selectableItemBackground">@drawable/ink_press_feedback</item>
+        <item name="selectableItemBackgroundBorderless">@drawable/ink_press_feedback</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="colorAccent">@color/accent</item>
@@ -39,16 +41,29 @@
         <item name="colorAccent">@color/md_grey_900</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay.Dark" parent="ThemeOverlay.AppCompat.Dark">
-        <item name="colorAccent">@color/md_grey_50</item>
-    </style>
-
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
         <item name="overlapAnchor">false</item>
         <item name="colorAccent">@color/md_grey_900</item>
     </style>
 
-    <style name="AppTheme.AlertDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert"/>
+    <style name="AppTheme.Dialog" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:windowAnimationStyle">@style/AnimationEInkInstant</item>
+    </style>
+
+    <style name="AppTheme.AlertDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="android:windowAnimationStyle">@style/AnimationEInkInstant</item>
+    </style>
+
+    <style name="AnimationEInkInstant">
+        <item name="android:windowEnterAnimation">@anim/ink_instant</item>
+        <item name="android:windowExitAnimation">@anim/ink_instant</item>
+        <item name="android:windowShowAnimation">@anim/ink_instant</item>
+        <item name="android:windowHideAnimation">@anim/ink_instant</item>
+        <item name="android:activityOpenEnterAnimation">@anim/ink_instant</item>
+        <item name="android:activityOpenExitAnimation">@anim/ink_instant</item>
+        <item name="android:activityCloseEnterAnimation">@anim/ink_instant</item>
+        <item name="android:activityCloseExitAnimation">@anim/ink_instant</item>
+    </style>
 
     <style name="Spinner" parent="android:Theme.Holo.Light" />
 
@@ -69,6 +84,7 @@
 
     <style name="Style.PopupMenu" parent="Widget.AppCompat.PopupMenu">
         <item name="android:popupBackground">@drawable/bg_popup_menu</item>
+        <item name="android:popupAnimationStyle">@style/AnimationEInkInstant</item>
     </style>
 
 
@@ -77,7 +93,7 @@
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">true</item>
-        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowAnimationStyle">@style/AnimationEInkInstant</item>
     </style>
 
     <style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">

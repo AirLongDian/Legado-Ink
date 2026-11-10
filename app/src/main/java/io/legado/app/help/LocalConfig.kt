@@ -10,24 +10,6 @@ object LocalConfig {
     private val localConfig =
         appCtx.getSharedPreferences("local", Context.MODE_PRIVATE)
 
-    val readHelpVersionIsLast: Boolean
-        get() = isLastVersion(1, "readHelpVersion", "firstRead")
-
-    val backupHelpVersionIsLast: Boolean
-        get() = isLastVersion(1, "backupHelpVersion", "firstBackup")
-
-    val readMenuHelpVersionIsLast: Boolean
-        get() = isLastVersion(1, "readMenuHelpVersion", "firstReadMenu")
-
-    val bookSourcesHelpVersionIsLast: Boolean
-        get() = isLastVersion(1, "bookSourceHelpVersion", "firstOpenBookSources")
-
-    val ruleHelpVersionIsLast: Boolean
-        get() = isLastVersion(1, "ruleHelpVersion")
-
-    val needUpHttpTTS: Boolean
-        get() = !isLastVersion(5, "httpTtsVersion")
-
     val needUpTxtTocRule: Boolean
         get() = !isLastVersion(1, "txtTocRuleVersion")
 

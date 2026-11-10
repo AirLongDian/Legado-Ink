@@ -26,18 +26,6 @@ import io.legado.app.utils.ColorUtils
 @Suppress("MemberVisibilityCanBePrivate")
 object TintHelper {
 
-    @SuppressLint("PrivateResource")
-    @ColorInt
-    private fun getDefaultRippleColor(context: Context, useDarkRipple: Boolean): Int {
-        // Light ripple is actually translucent black, and vice versa
-        return ContextCompat.getColor(
-            context, if (useDarkRipple)
-                R.color.ripple_material_light
-            else
-                R.color.ripple_material_dark
-        )
-    }
-
     private fun getDisabledColorStateList(
         @ColorInt normal: Int,
         @ColorInt disabled: Int
@@ -58,7 +46,7 @@ object TintHelper {
         )
         val pressed = ColorUtils.shiftColor(color, if (darker) 0.9f else 1.1f)
         val activated = ColorUtils.shiftColor(color, if (darker) 1.1f else 0.9f)
-        val rippleColor = getDefaultRippleColor(view.context, isColorLight)
+        val rippleColor = android.graphics.Color.TRANSPARENT
         val textColor = ContextCompat.getColor(
             view.context,
             if (isColorLight) R.color.ate_primary_text_light else R.color.ate_primary_text_dark

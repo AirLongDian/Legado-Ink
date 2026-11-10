@@ -24,7 +24,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import io.legado.app.R
 import io.legado.app.constant.AppConst
 import timber.log.Timber
@@ -188,15 +187,6 @@ fun Context.share(text: String, title: String = getString(R.string.share)) {
         intent.type = "text/plain"
         startActivity(Intent.createChooser(intent, title))
     }
-}
-
-@SuppressLint("SetWorldReadable")
-fun Context.shareWithQr(
-    text: String,
-    title: String = getString(R.string.share),
-    errorCorrectionLevel: ErrorCorrectionLevel = ErrorCorrectionLevel.H
-) {
-    toastOnUi(R.string.text_too_long_qr_error)
 }
 
 fun Context.sendToClip(text: String) {

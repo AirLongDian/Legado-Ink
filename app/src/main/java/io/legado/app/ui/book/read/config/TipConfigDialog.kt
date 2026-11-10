@@ -3,7 +3,6 @@ package io.legado.app.ui.book.read.config
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import io.legado.app.R
 import io.legado.app.base.BaseDialogFragment
 import io.legado.app.constant.EventBus
@@ -17,10 +16,6 @@ import io.legado.app.utils.viewbindingdelegate.viewBinding
 
 class TipConfigDialog : BaseDialogFragment(R.layout.dialog_tip_config) {
 
-    companion object {
-        const val TIP_COLOR = 7897
-    }
-
     private val binding by viewBinding(DialogTipConfigBinding::bind)
 
     override fun onStart() {
@@ -31,9 +26,6 @@ class TipConfigDialog : BaseDialogFragment(R.layout.dialog_tip_config) {
     override fun onFragmentCreated(view: View, savedInstanceState: Bundle?) {
         initView()
         initEvent()
-        observeEvent<String>(EventBus.TIP_COLOR) {
-            upTvTipColor()
-        }
     }
 
     private fun initView() = binding.run {
@@ -52,16 +44,6 @@ class TipConfigDialog : BaseDialogFragment(R.layout.dialog_tip_config) {
         tvFooterMiddle.text = ReadTipConfig.tipFooterMiddleStr
         tvFooterRight.text = ReadTipConfig.tipFooterRightStr
 
-        upTvTipColor()
-    }
-
-    private fun upTvTipColor() {
-        binding.tvTipColor.text =
-            if (ReadTipConfig.tipColor == 0) {
-                "跟随正文"
-            } else {
-                "#${ReadTipConfig.tipColor.hexString}"
-            }
     }
 
     private fun initEvent() = binding.run {
@@ -145,22 +127,7 @@ class TipConfigDialog : BaseDialogFragment(R.layout.dialog_tip_config) {
                 postEvent(EventBus.UP_CONFIG, true)
             }
         }
-        llTipColor.setOnClickListener {
-            context?.selector(items = arrayListOf("跟随正文", "自定义")) { _, i ->
-                when (i) {
-                    0 -> {
-                        ReadTipConfig.tipColor = 0
-                        upTvTipColor()
-                        postEvent(EventBus.UP_CONFIG, true)
-                    }
-                    1 -> ColorPickerDialog.newBuilder()
-                        .setShowAlphaSlider(false)
-                        .setDialogType(ColorPickerDialog.TYPE_CUSTOM)
-                        .setDialogId(TIP_COLOR)
-                        .show(requireActivity())
-                }
-            }
-        }
+
     }
 
     private fun clearRepeat(repeat: Int) = ReadTipConfig.apply {

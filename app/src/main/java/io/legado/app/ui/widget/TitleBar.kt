@@ -66,10 +66,7 @@ class TitleBar @JvmOverloads constructor(
         val titleText = a.getString(R.styleable.TitleBar_title)
         val subtitleText = a.getString(R.styleable.TitleBar_subtitle)
 
-        when (a.getInt(R.styleable.TitleBar_themeMode, 0)) {
-            1 -> inflate(context, R.layout.view_title_bar_dark, this)
-            else -> inflate(context, R.layout.view_title_bar, this)
-        }
+        inflate(context, R.layout.view_title_bar, this)
         toolbar = findViewById(R.id.toolbar)
 
         toolbar.apply {

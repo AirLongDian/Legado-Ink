@@ -20,7 +20,6 @@ import io.legado.app.databinding.FragmentBooksBinding
 import io.legado.app.help.AppConfig
 import io.legado.app.lib.theme.accentColor
 import io.legado.app.lib.theme.primaryColor
-import io.legado.app.ui.book.audio.AudioPlayActivity
 import io.legado.app.ui.book.info.BookInfoActivity
 import io.legado.app.ui.book.read.ReadBookActivity
 import io.legado.app.ui.main.MainViewModel
@@ -133,7 +132,7 @@ class BooksFragment() : BaseFragment(R.layout.fragment_books),
         if (AppConfig.isEInkMode) {
             binding.rvBookshelf.scrollToPosition(0)
         } else {
-            binding.rvBookshelf.smoothScrollToPosition(0)
+            binding.rvBookshelf.scrollToPosition(0)
         }
     }
 
@@ -142,14 +141,8 @@ class BooksFragment() : BaseFragment(R.layout.fragment_books),
     }
 
     override fun open(book: Book) {
-        when (book.type) {
-            BookType.audio ->
-                startActivity<AudioPlayActivity> {
-                    putExtra("bookUrl", book.bookUrl)
-                }
-            else -> startActivity<ReadBookActivity> {
-                putExtra("bookUrl", book.bookUrl)
-            }
+        startActivity<ReadBookActivity> {
+            putExtra("bookUrl", book.bookUrl)
         }
     }
 

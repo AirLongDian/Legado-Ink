@@ -22,6 +22,7 @@ class KeyboardToolPop(
 
     init {
         contentView = binding.root
+        animationStyle = 0
 
         isTouchable = true
         isOutsideTouchable = false

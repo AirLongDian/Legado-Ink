@@ -17,7 +17,6 @@ import io.legado.app.databinding.ActivityBookReadBinding
 import io.legado.app.databinding.DialogDownloadChoiceBinding
 import io.legado.app.databinding.DialogEditTextBinding
 import io.legado.app.help.AppConfig
-import io.legado.app.help.LocalConfig
 import io.legado.app.help.ReadBookConfig
 import io.legado.app.lib.dialogs.alert
 import io.legado.app.lib.dialogs.selector
@@ -26,7 +25,6 @@ import io.legado.app.lib.theme.backgroundColor
 import io.legado.app.lib.theme.bottomBackground
 import io.legado.app.model.CacheBook
 import io.legado.app.model.ReadBook
-import io.legado.app.ui.book.read.config.BgTextConfigDialog
 import io.legado.app.ui.book.read.config.ClickActionConfigDialog
 import io.legado.app.ui.book.read.config.PaddingConfigDialog
 import io.legado.app.utils.*
@@ -51,17 +49,10 @@ abstract class BaseReadBookActivity :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         binding.navigationBar.setBackgroundColor(bottomBackground)
-        if (!LocalConfig.readHelpVersionIsLast) {
-            showClickRegionalConfig()
-        }
     }
 
     fun showPaddingConfig() {
         showDialogFragment<PaddingConfigDialog>()
-    }
-
-    fun showBgTextConfig() {
-        showDialogFragment<BgTextConfigDialog>()
     }
 
     fun showClickRegionalConfig() {
@@ -236,20 +227,6 @@ abstract class BaseReadBookActivity :
                 }
             }
             cancelButton()
-        }
-    }
-
-    fun showPageAnimConfig(success: () -> Unit) {
-        val items = arrayListOf<String>()
-        items.add(getString(R.string.btn_default_s))
-        items.add(getString(R.string.page_anim_cover))
-        items.add(getString(R.string.page_anim_slide))
-        items.add(getString(R.string.page_anim_simulation))
-        items.add(getString(R.string.page_anim_scroll))
-        items.add(getString(R.string.page_anim_none))
-        selector(R.string.page_anim, items) { _, i ->
-            ReadBook.book?.setPageAnim(i - 1)
-            success()
         }
     }
 

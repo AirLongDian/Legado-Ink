@@ -1,8 +1,6 @@
 # 放置与界面有关的类
 
-* about 关于界面
 * association 导入书源界面
-* book\audio 音频播放界面
 * book\arrange 书架整理界面
 * book\info 书籍信息查看
 * book\read 书籍阅读界面
@@ -13,8 +11,7 @@
 * book\toc 目录界面
 * book\download 下载界面
 * book\explore 发现界面
-* book\local 书籍导入界面
-* document 文件选择界面
+* document 系统文件选择界面
 * config 配置界面
 * main 主界面
 * qrCode 二维码扫描界面

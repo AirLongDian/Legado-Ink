@@ -115,39 +115,6 @@ data class TextPage(
         return this
     }
 
-    fun removePageAloudSpan(): TextPage {
-        textLines.forEach { textLine ->
-            textLine.isReadAloud = false
-        }
-        return this
-    }
-
-    fun upPageAloudSpan(aloudSpanStart: Int) {
-        removePageAloudSpan()
-        var lineStart = 0
-        for ((index, textLine) in textLines.withIndex()) {
-            if (aloudSpanStart > lineStart && aloudSpanStart < lineStart + textLine.text.length) {
-                for (i in index - 1 downTo 0) {
-                    if (textLines[i].text.endsWith("\n")) {
-                        break
-                    } else {
-                        textLines[i].isReadAloud = true
-                    }
-                }
-                for (i in index until textLines.size) {
-                    if (textLines[i].text.endsWith("\n")) {
-                        textLines[i].isReadAloud = true
-                        break
-                    } else {
-                        textLines[i].isReadAloud = true
-                    }
-                }
-                break
-            }
-            lineStart += textLine.text.length
-        }
-    }
-
     val readProgress: String
         get() {
             val df = DecimalFormat("0.0%")

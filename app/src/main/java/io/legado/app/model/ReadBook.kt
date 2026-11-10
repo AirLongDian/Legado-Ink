@@ -11,7 +11,6 @@ import io.legado.app.help.ReadBookConfig
 import io.legado.app.help.coroutine.Coroutine
 import io.legado.app.help.storage.AppWebDav
 import io.legado.app.model.webBook.WebBook
-import io.legado.app.service.BaseReadAloudService
 import io.legado.app.ui.book.read.page.entities.TextChapter
 import io.legado.app.ui.book.read.page.provider.ChapterProvider
 import io.legado.app.ui.book.read.page.provider.ImageProvider
@@ -41,13 +40,9 @@ object ReadBook : CoroutineScope by MainScope() {
     var bookSource: BookSource? = null
     var msg: String? = null
     private val loadingChapters = arrayListOf<Int>()
-    private val readRecord = ReadRecord()
-    var readStartTime: Long = System.currentTimeMillis()
 
     fun resetData(book: Book) {
         ReadBook.book = book
-        readRecord.bookName = book.name
-        readRecord.readTime = appDb.readRecordDao.getReadTime(book.name) ?: 0
         chapterSize = appDb.bookChapterDao.getChapterCount(book.bookUrl)
         durChapterIndex = book.durChapterIndex
         durChapterPos = book.durChapterPos
@@ -98,14 +93,6 @@ object ReadBook : CoroutineScope by MainScope() {
     fun uploadProgress() {
         book?.let {
             AppWebDav.uploadBookProgress(it)
-        }
-    }
-
-    fun upReadStartTime() {
-        Coroutine.async {
-            readRecord.readTime = readRecord.readTime + System.currentTimeMillis() - readStartTime
-            readStartTime = System.currentTimeMillis()
-            appDb.readRecordDao.insert(readRecord)
         }
     }
 
@@ -189,21 +176,8 @@ object ReadBook : CoroutineScope by MainScope() {
      */
     private fun curPageChanged() {
         callBack?.pageChanged()
-        if (BaseReadAloudService.isRun) {
-            readAloud(!BaseReadAloudService.pause)
-        }
-        upReadStartTime()
         preDownload()
         ImageProvider.clearOut(durChapterIndex)
-    }
-
-    /**
-     * 朗读
-     */
-    fun readAloud(play: Boolean = true) {
-        book?.let {
-            ReadAloud.play(appCtx, play)
-        }
     }
 
     /**
@@ -386,16 +360,6 @@ object ReadBook : CoroutineScope by MainScope() {
                 nextTextChapter ?: loadContent(1)
             }
         }
-    }
-
-    fun pageAnim(): Int {
-        book?.let {
-            return if (it.getPageAnim() < 0)
-                ReadBookConfig.pageAnim
-            else
-                it.getPageAnim()
-        }
-        return ReadBookConfig.pageAnim
     }
 
     fun setCharset(charset: String) {

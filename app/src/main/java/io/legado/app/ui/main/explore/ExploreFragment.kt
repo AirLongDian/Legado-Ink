@@ -184,7 +184,7 @@ class ExploreFragment : VMBaseFragment<ExploreViewModel>(R.layout.fragment_explo
             if (AppConfig.isEInkMode) {
                 binding.rvFind.scrollToPosition(0)
             } else {
-                binding.rvFind.smoothScrollToPosition(0)
+                binding.rvFind.scrollToPosition(0)
             }
         }
     }

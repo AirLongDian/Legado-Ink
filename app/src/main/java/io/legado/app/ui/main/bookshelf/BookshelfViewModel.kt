@@ -1,6 +1,7 @@
 package io.legado.app.ui.main.bookshelf
 
 import android.app.Application
+import android.net.Uri
 import io.legado.app.R
 import io.legado.app.base.BaseViewModel
 import io.legado.app.data.appDb
@@ -10,12 +11,23 @@ import io.legado.app.help.http.newCallResponseBody
 import io.legado.app.help.http.okHttpClient
 import io.legado.app.help.http.text
 import io.legado.app.model.NoStackTraceException
+import io.legado.app.model.localBook.LocalBook
 import io.legado.app.model.webBook.WebBook
 import io.legado.app.utils.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.isActive
 
 class BookshelfViewModel(application: Application) : BaseViewModel(application) {
+
+    fun importLocalBooks(uris: List<Uri>) {
+        execute {
+            uris.forEach { LocalBook.importFile(it) }
+        }.onSuccess {
+            context.toastOnUi(R.string.success)
+        }.onError {
+            context.toastOnUi(it.localizedMessage ?: "ERROR")
+        }
+    }
 
     fun addBookByUrl(bookUrls: String) {
         var successCount = 0

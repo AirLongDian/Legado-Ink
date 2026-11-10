@@ -64,7 +64,7 @@
         android:layout_height="8dp"
         android:contentDescription="@string/more_menu"
         android:scaleType="centerCrop"
-        android:src="@color/md_green_600"
+        android:src="@color/black"
         app:layout_constraintRight_toRightOf="@id/iv_menu_more"
         app:layout_constraintTop_toTopOf="@id/iv_menu_more" />
 
@@ -82,14 +82,12 @@
         tools:text="@string/debug_hint"
         tools:visibility="visible" />
 
-    <io.legado.app.lib.theme.view.ThemeProgressBar
+    <View
         android:id="@+id/iv_progressBar"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         android:layout_gravity="start|center_vertical"
-        android:animationResolution="1000"
-        android:indeterminate="true"
-        android:indeterminateBehavior="repeat"
+        android:background="@color/primaryText"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/iv_debug_text"
         app:layout_constraintRight_toRightOf="parent"

@@ -55,11 +55,6 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/menu_page_anim"
-        android:title="@string/book_page_anim"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/menu_get_progress"
         android:title="@string/get_book_progress"
         app:showAsAction="never" />
@@ -77,13 +72,6 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/menu_re_segment"
-        android:title="@string/re_segment"
-        android:checkable="true"
-        android:checked="false"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/menu_image_style"
         android:title="@string/image_style"
         app:showAsAction="never" />
@@ -96,11 +84,6 @@
     <item
         android:id="@+id/menu_log"
         android:title="@string/log"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/menu_help"
-        android:title="@string/help"
         app:showAsAction="never" />
 
 </menu>

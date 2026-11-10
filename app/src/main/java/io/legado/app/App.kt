@@ -9,8 +9,6 @@ import androidx.multidex.MultiDexApplication
 import com.jeremyliao.liveeventbus.LiveEventBus
 import io.legado.app.base.AppContextWrapper
 import io.legado.app.constant.AppConst.channelIdDownload
-import io.legado.app.constant.AppConst.channelIdReadAloud
-import io.legado.app.constant.AppConst.channelIdWeb
 import io.legado.app.help.AppConfig
 import io.legado.app.help.CrashHandler
 import io.legado.app.help.LifecycleHelp
@@ -66,28 +64,8 @@ class App : MultiDexApplication() {
                 setSound(null, null)
             }
 
-            val readAloudChannel = NotificationChannel(
-                channelIdReadAloud,
-                getString(R.string.read_aloud),
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                enableLights(false)
-                enableVibration(false)
-                setSound(null, null)
-            }
-
-            val webChannel = NotificationChannel(
-                channelIdWeb,
-                getString(R.string.web_service),
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                enableLights(false)
-                enableVibration(false)
-                setSound(null, null)
-            }
-
             //向notification manager 提交channel
-            it.createNotificationChannels(listOf(downloadChannel, readAloudChannel, webChannel))
+            it.createNotificationChannel(downloadChannel)
         }
     }
 

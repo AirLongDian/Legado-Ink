@@ -33,20 +33,6 @@
             android:checked="true"
             android:text="@string/discovery" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/book_type"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="3dp"
-            tools:ignore="RtlHardcoded" />
-
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/sp_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:entries="@array/book_type"
-            app:theme="@style/Spinner" />
     </LinearLayout>
 
     <com.google.android.material.tabs.TabLayout
@@ -88,7 +74,7 @@
 
     </com.google.android.material.tabs.TabLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <io.legado.app.ui.widget.recycler.InkRecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

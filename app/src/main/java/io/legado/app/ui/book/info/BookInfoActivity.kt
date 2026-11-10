@@ -9,8 +9,6 @@ import android.widget.CheckBox
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestOptions.bitmapTransform
 import io.legado.app.R
 import io.legado.app.base.VMBaseActivity
 import io.legado.app.constant.BookType
@@ -21,15 +19,11 @@ import io.legado.app.data.entities.BookChapter
 import io.legado.app.data.entities.BookSource
 import io.legado.app.databinding.ActivityBookInfoBinding
 import io.legado.app.databinding.DialogEditTextBinding
-import io.legado.app.help.BlurTransformation
-import io.legado.app.help.glide.ImageLoader
 import io.legado.app.lib.dialogs.alert
 import io.legado.app.lib.theme.backgroundColor
 import io.legado.app.lib.theme.bottomBackground
 import io.legado.app.lib.theme.getPrimaryTextColor
-import io.legado.app.model.BookCover
-import io.legado.app.ui.about.AppLogDialog
-import io.legado.app.ui.book.audio.AudioPlayActivity
+import io.legado.app.ui.log.AppLogDialog
 import io.legado.app.ui.book.changecover.ChangeCoverDialog
 import io.legado.app.ui.book.changesource.ChangeSourceDialog
 import io.legado.app.ui.book.group.GroupSelectDialog
@@ -47,7 +41,7 @@ import kotlinx.coroutines.withContext
 
 
 class BookInfoActivity :
-    VMBaseActivity<ActivityBookInfoBinding, BookInfoViewModel>(toolBarTheme = Theme.Dark),
+    VMBaseActivity<ActivityBookInfoBinding, BookInfoViewModel>(toolBarTheme = Theme.EInk),
     GroupSelectDialog.CallBack,
     ChangeSourceDialog.CallBack,
     ChangeCoverDialog.CallBack {
@@ -97,7 +91,6 @@ class BookInfoActivity :
 
     @SuppressLint("PrivateResource")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        binding.titleBar.transparent()
         binding.arcView.setBgColor(backgroundColor)
         binding.llInfo.setBackgroundColor(backgroundColor)
         binding.scrollView.setBackgroundColor(backgroundColor)
@@ -144,7 +137,7 @@ class BookInfoActivity :
                 viewModel.bookData.value?.let {
                     val bookJson = GSON.toJson(it)
                     val shareStr = "${it.bookUrl}#$bookJson"
-                    shareWithQr(shareStr, it.name)
+                    share(shareStr, it.name)
                 }
             }
             R.id.menu_refresh -> {
@@ -207,11 +200,6 @@ class BookInfoActivity :
 
     private fun showCover(book: Book) {
         binding.ivCover.load(book.getDisplayCover(), book.name, book.author)
-        ImageLoader.load(this, book.getDisplayCover())
-            .transition(DrawableTransitionOptions.withCrossFade(1500))
-            .thumbnail(BookCover.getBlurDefaultCover(this))
-            .apply(bitmapTransform(BlurTransformation(this, 25)))
-            .into(binding.bgBook)  //模糊、渐变、缩小效果
     }
 
     private fun upLoading(isLoading: Boolean, chapterList: List<BookChapter>? = null) {
@@ -419,18 +407,11 @@ class BookInfoActivity :
     }
 
     private fun startReadActivity(book: Book) {
-        when (book.type) {
-            BookType.audio -> readBookResult.launch(
-                Intent(this, AudioPlayActivity::class.java)
-                    .putExtra("bookUrl", book.bookUrl)
-                    .putExtra("inBookshelf", viewModel.inBookshelf)
-            )
-            else -> readBookResult.launch(
-                Intent(this, ReadBookActivity::class.java)
-                    .putExtra("bookUrl", book.bookUrl)
-                    .putExtra("inBookshelf", viewModel.inBookshelf)
-            )
-        }
+        readBookResult.launch(
+            Intent(this, ReadBookActivity::class.java)
+                .putExtra("bookUrl", book.bookUrl)
+                .putExtra("inBookshelf", viewModel.inBookshelf)
+        )
     }
 
     override val oldBook: Book?

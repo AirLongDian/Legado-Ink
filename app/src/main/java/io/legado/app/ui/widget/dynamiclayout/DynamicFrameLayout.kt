@@ -6,7 +6,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewStub
 import android.widget.FrameLayout
-import android.widget.ProgressBar
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -24,7 +23,6 @@ class DynamicFrameLayout @JvmOverloads constructor(
     private var actionBtn: AppCompatButton? = null
 
     private var progressView: View? = null
-    private var progressBar: ProgressBar? = null
 
     private var contentView: View? = null
 
@@ -167,7 +165,6 @@ class DynamicFrameLayout @JvmOverloads constructor(
     private fun ensureProgressView() {
         if (progressView == null) {
             progressView = findViewById<ViewStub>(R.id.progress_view_stub).inflate()
-            progressBar = progressView?.findViewById(R.id.loading_progress)
         }
     }
 

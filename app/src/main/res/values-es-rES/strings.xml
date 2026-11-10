@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--App-->
-    <string name="app_name">Legado</string>
+    <string name="app_name">阅读·墨水屏</string>
     <string name="receiving_shared_label">Legado·buscador</string>
     <string name="tip_perm_request_storage">Legado necesita de acceso de almacenamineto para buscar y leer libros. Por favor, diríjase a los "Ajustes de la aplicación" para conceder el "Permiso de almacenamineto".</string>
 
@@ -15,8 +15,6 @@
     <string name="webdav_cache_backup_s">Exporta localmente lo respalda para su exportación</string>
     <string name="backup_path">Respaldar para</string>
     <string name="select_backup_path">Por favor, seleccione una carpeta de respaldo.</string>
-    <string name="menu_import_old_version">Importar desde legado</string>
-    <string name="menu_import_github">Importar datos de Github</string>
     <string name="menu_replace_rule">Reemplazo</string>
     <string name="menu_send">Enviar</string>
 
@@ -47,7 +45,6 @@
     <string name="all">Todo</string>
     <string name="recent_reading">Lecturas recientes</string>
     <string name="last_read">Última lectura</string>
-    <string name="update_log">Novedades</string>
     <string name="bookshelf_empty">La estantería está vacía. ¡Busque libros o añádalos desde una fuente pública!</string>
     <string name="action_search">Buscar</string>
     <string name="action_download">Descargar</string>
@@ -68,12 +65,9 @@
     <string name="theme_setting_s">Configuraciones relacionadas a los temas visuales</string>
     <string name="other_setting">Otros ajustes</string>
     <string name="other_setting_s">Algunas configuraciones relacionadas a su funcionamiento</string>
-    <string name="about">Acerca de</string>
-    <string name="donate">Donaciones</string>
     <string name="exit">Sair</string>
     <string name="exit_no_save">Todavía se guardó. ¿Desea continuar editando?</string>
     <string name="read_style">Tipos de libros</string>
-    <string name="version">Versión</string>
     <string name="local">Local</string>
     <string name="search">Buscar</string>
     <string name="origin_format">Origen: %s</string>
@@ -91,9 +85,7 @@
     <string name="offline_cache_t">Caché sin conexión</string>
     <string name="offline_cache_s">precarga el o los capítulos(s) seleccionado(s) en Almacenamiento en caché</string>
     <string name="change_origin">Cambiar origen</string>
-    <string name="about_description">\u3000\u3000 Este es una aplicación de lectura bajo software libre, desarrollado en Kotlin, en que podrás participar. ¡Síguelos en la cuenta oficial de WeChat!</string>
     <string name="app_share_description">Legado (YueDu 3.0) disponible para descargar en：\n https://play.google.com/store/apps/details?id=io.legado.play.release</string>
-    <string name="version_name">Versión %s</string>
     <string name="pt_background_verification">Verificación en segundo plano</string>
     <string name="ps_background_verification">podrá utilizar con libertad cuando se verifique la fuente del libro</string>
     <string name="pt_auto_refresh">Actualización automática</string>
@@ -102,7 +94,6 @@
     <string name="ps_auto_download">Baja los últimos capítulos automaticamente al actualizar los libros</string>
     <string name="backup_restore">Respaldo y restauración</string>
     <string name="web_dav_set">Ajustes de WebDav</string>
-    <string name="web_dav_set_import_old">Ajustes de WebDave importación de datos anteriores</string>
     <string name="backup">Respaldar</string>
     <string name="restore">Restaurar</string>
     <string name="backup_permission">El respaldo necesita de permisos de almacenamineto</string>
@@ -176,7 +167,6 @@
     <string name="copy_source">Copiar fuente</string>
     <string name="paste_source">Pegar fuente</string>
     <string name="source_rule_s">Descripción de las reglas de fuente</string>
-    <string name="check_update">Comprobar actualizaciones</string>
     <string name="camera_scan">Digitalizar código QR</string>
     <string name="scan_image">Digitalizar imágenes locales</string>
     <string name="rule_summary">Descripción de las reglas</string>
@@ -195,8 +185,6 @@
     <string name="book">Libro</string>
     <string name="volume_key_page">Botones de volumen para pasar página</string>
     <string name="click_turn_page">Toque la pantalla para pasar página</string>
-    <string name="page_anim">Animación de hojeada</string>
-    <string name="book_page_anim">Animación de hojeada (libro)</string>
     <string name="keep_light">Mantener pantalla encendida</string>
     <string name="back">Regresar</string>
     <string name="menu">Menú</string>
@@ -210,7 +198,6 @@
     <string name="select_all">Seleccionar todo</string>
     <string name="select_all_count">Selecionar todo (%1$d/%2$d)</string>
     <string name="select_cancel_count">Dejar de seleccionar todo (%1$d/%2$d)</string>
-    <string name="dark_theme">Modo oscuro</string>
     <string name="welcome">Página de bienvenida</string>
     <string name="download_start">Iniciar descarga</string>
     <string name="download_cancel">Cancelar descarga</string>
@@ -230,7 +217,6 @@
     <string name="origin_show">Origen: %s</string>
     <string name="import_replace_rule">Importar reglas replace</string>
     <string name="import_replace_rule_on_line">Importar reglas en línea</string>
-    <string name="check_update_interval">Intervalo de actualizaciones</string>
     <string name="bookshelf_px_0">Lista de recientes</string>
     <string name="bookshelf_px_1">Fecha de actualización</string>
     <string name="bookshelf_px_2">Título del libro</string>
@@ -329,8 +315,6 @@
     <string name="menu_action_group">Grupos</string>
     <string name="download_path">Carpeta de caché</string>
     <string name="sys_file_picker">Selector de archivos del sistema</string>
-    <string name="new_version">Nueva versión</string>
-    <string name="download_update">Descargar actualizaciones</string>
     <string name="volume_key_page_on_play">Botones de volumen para pasar las páginas mientras lee</string>
     <string name="tip_margin_change">Ajuste de margen</string>
     <string name="allow_update">Activar actualizaciones</string>
@@ -366,12 +350,6 @@
     <string name="add_to_shelf">Agregar a la estantería</string>
     <string name="continue_read">Seguir leyendo</string>
     <string name="cover_path">Carpeta de portada</string>
-    <string name="page_anim_cover">Portada</string>
-    <string name="page_anim_slide">Diapositiva</string>
-    <string name="page_anim_simulation">Simulación</string>
-    <string name="page_anim_scroll">Desplazado</string>
-    <string name="page_anim_none">Ninguno</string>
-    <string name="donate_s">La fuente de este libro utiliza funciones avanzadas, para desbloquear diríjase a Donaciones y toque el código de búsqueda del sobre rojo de Alipay para recibir ese sobre.</string>
     <string name="up_change_source_last_chapter_t">Actualiza el último capítulo después del cambio de fuente en segundo plano</string>
     <string name="up_change_source_last_chapter_s">si está habilitado, la actualización comenzará 1 minuto después de que se abra la aplicación</string>
     <string name="behavior_main_t">Ocultar automáticamente la barra de herramientas</string>
@@ -457,13 +435,9 @@
 
     <string name="source_http_header">Encabezado HTTP</string>
     <string name="debug_source">Fuente de depuración</string>
-    <string name="import_by_qr_code">Importar desde código QR</string>
     <string name="share_selected_source">Compartir fuentes seleccionadas</string>
-    <string name="scan_qr_code">Escanear código QR</string>
     <string name="click_on_selected_show_menu">Toque para mostrar el menú cuando esté seleccionado</string>
     <string name="theme">Tema</string>
-    <string name="theme_mode">Tipo de tema</string>
-    <string name="theme_mode_desc">Seleccione el tema que prefiera</string>
     <string name="join_qq_group">Únase al grupo QQ</string>
     <string name="bg_image_per">Para establecer la imagen de fondo requiere del permiso de almacenamiento</string>
     <string name="input_book_source_url">Ingrese la dirección de origen del libro</string>
@@ -489,7 +463,6 @@
     <string name="sure_del_any">¿Está seguro de que desea borra %s?</string>
     <string name="sure_del_all_book">Está seguro de que desea eliminar todos los libros?</string>
     <string name="sure_del_download_book">¿También desea eliminar los capítulos de libros descargados?</string>
-    <string name="qr_per">Escanear el código QR requiere permiso de la cámara</string>
     <string name="aloud_can_not_auto_page">La voz se está ejecutando, no se puede pasar las páginas automáticamente</string>
     <string name="input_charset">Codificación de entrada</string>
     <string name="text_chapter_list_rule">Capítulos de Txt Regex</string>
@@ -535,7 +508,6 @@
     <string name="web_menu">Servicio web</string>
     <string name="web_port_title">Puerto web</string>
     <string name="web_port_summary">Puerto actual %s</string>
-    <string name="qr_share">Compartir código QR</string>
     <string name="str_share">Compartir cadenas</string>
     <string name="wifi_share">Compartir Wifi</string>
     <string name="please_grant_storage_permission">Conceda el permiso de almacenamiento</string>
@@ -553,7 +525,6 @@
     <string name="clear_find_cache">Limpiar la caché de búsqueda</string>
     <string name="edit_find">Editar búsqueda</string>
     <string name="change_icon_summary">Cambie el icono de software que se muestra en el escritorio</string>
-    <string name="help">Ayuda</string>
     <string name="my">Mío</string>
     <string name="reading">Lecturas</string>
     <string name="battery_show">%d%%</string>
@@ -617,7 +588,6 @@
     <string name="prev_sentence">Oración anterior</string>
     <string name="next_sentence">Siguiente oración</string>
     <string name="other_folder">Otra carpeta</string>
-    <string name="text_too_long_qr_error">Demasiadas palabras para crear un código QR</string>
     <string name="share_rss_source">Compartir fuentes de suscripción</string>
     <string name="share_book_source">Compartir fuentes de libros</string>
     <string name="auto_dark_mode">Cambio automático al modo oscuro</string>
@@ -688,7 +658,6 @@
     <string name="follow_official_account">Follow WeChat Official Accounts</string>
     <string name="wechat">WeChat</string>
     <string name="thanks">Supporting me will be appreciated</string>
-    <string name="about_official_account">Official Accounts[开源阅读]</string>
     <string name="source_auto_changing">Changing source</string>
     <string name="click_to_apply">Tap to join</string>
     <string name="middle">Middle</string>
@@ -719,7 +688,6 @@
     <string name="sort_by_url">Ordenar por URL</string>
     <string name="backup_summary">Respalde en simultáneo vía local y WebDav</string>
     <string name="restore_summary">Restaure primero desde WebDAV, haga clic en restaurar desde la ubicación del respaldo</string>
-    <string name="import_old_summary">Seleccione una carpeta de respaldo heredada</string>
     <string name="enabled">Activado</string>
     <string name="disabled">Desactivado</string>
     <string name="starting_download">Iniciando descarga</string>
@@ -727,12 +695,6 @@
     <string name="click_to_open">Haga clic para abrir</string>
     <string name="follow_public_account_summary">Siga [开源阅读] para obtener ayuda haciendo clic en los anuncios</string>
     <string name="weChat_appreciation_code">Código de sugerencia de WeChat</string>
-    <string name="alipay">AliPay</string>
-    <string name="alipay_red_envelope_search_code">Sobre rojo de AliPay, código de búsqueda</string>
-    <string name="alipay_red_envelope_copy">537954522 Haga clic para copiar</string>
-    <string name="alipay_red_envelope_qr_code">Código QR del sobre rojo de AliPay</string>
-    <string name="alipay_payment_qr_code">Código QR de AliPay</string>
-    <string name="qq_collection_qr_code">Código QR de la Colección QQ</string>
     <string name="contributors_summary">gedoor, Invinciblelee, etc. Para obtener más detalles, vaya a Github</string>
     <string name="clear_cache_summary">Limpiar la caché de libros y fuentes descargados</string>
     <string name="default_cover">Portada predeterminada</string>
@@ -755,13 +717,8 @@
     <string name="show_brightness_view">Mostrar widget de brillo</string>
     <string name="language">Idioma</string>
     <string name="import_rss_source">Importar fuente RSS</string>
-    <string name="donate_summary">Su donación mejora esta aplicación</string>
-    <string name="about_summary">Cuenta oficial de Wechat [开源阅读软件]</string>
-    <string name="read_record">Leer historial</string>
-    <string name="read_record_summary">Leer resumen del historial</string>
     <string name="local_tts">TTS local</string>
     <string name="thread_count">Recuento de subprocesos</string>
-    <string name="all_read_time">Tiempo total de lectura</string>
     <string name="un_select_all">Deseleccionar todo</string>
     <string name="import_str">Importar</string>
     <string name="export_str">Exportar</string>
@@ -779,7 +736,6 @@
     <string name="theme_name">Nombre del tema</string>
     <string name="auto_clear_expired">Limpiar automáticamente los datos de búsqueda caducados</string>
     <string name="auto_clear_expired_summary">Historial de búsqueda de más de un día</string>
-    <string name="re_segment">Volver a segmentar</string>
     <string name="style_name">Formato de nombre:</string>
     <string name="empty_msg_import_book">Haga clic en el icono de carpeta en la esquina superior derecha y seleccione la carpeta</string>
     <string name="scan_folder">Búsqueda inteligente</string>

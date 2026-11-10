@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string-array name="book_type">
-		<item>Texto</item>
-		<item>Audio</item>
-	</string-array>
 
 	<string-array name="group_style">
 		<item>Pestaña</item>
@@ -30,13 +26,6 @@
 		<item>@string/jf_convert_f</item>
 	</string-array>
 
-	<string-array name="theme_mode">
-		<item>Adaptar do sistema</item>
-		<item>Tema Claro</item>
-		<item>Tema Oscuro</item>
-		<item>Tema E-Ink</item>
-	</string-array>
-
 	<string-array name="NavBarColors">
 		<item>Autom.</item>
 		<item>Oscuro</item>
@@ -59,15 +48,6 @@
 		<item>@string/screen_sensor</item>
 	</string-array>
 
-	<string-array name="icon_names">
-		<item>íconePrincipal</item>
-		<item>ícone1</item>
-		<item>ícone2</item>
-		<item>ícone3</item>
-		<item>ícone4</item>
-		<item>ícone5</item>
-		<item>ícone6</item>
-	</string-array>
 
 	<string-array name="chinese_mode">
 		<item>Desativado</item>

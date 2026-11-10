@@ -27,8 +27,6 @@ class ClickActionConfigDialog : BaseDialogFragment(R.layout.dialog_click_action_
             this[2] = getString(R.string.prev_page)
             this[3] = getString(R.string.next_chapter)
             this[4] = getString(R.string.previous_chapter)
-            this[5] = getString(R.string.read_aloud_prev_paragraph)
-            this[6] = getString(R.string.read_aloud_next_paragraph)
         }
     }
 

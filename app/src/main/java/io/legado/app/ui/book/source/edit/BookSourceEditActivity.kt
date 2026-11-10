@@ -12,7 +12,6 @@ import android.widget.PopupWindow
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import io.legado.app.R
 import io.legado.app.base.VMBaseActivity
 import io.legado.app.constant.AppConst
@@ -28,7 +27,6 @@ import io.legado.app.ui.book.source.debug.BookSourceDebugActivity
 import io.legado.app.ui.document.HandleFileContract
 import io.legado.app.ui.login.SourceLoginActivity
 import io.legado.app.ui.widget.KeyboardToolPop
-import io.legado.app.ui.widget.dialog.TextDialog
 import io.legado.app.utils.*
 import io.legado.app.utils.viewbindingdelegate.viewBinding
 import kotlin.math.abs
@@ -69,9 +67,6 @@ class BookSourceEditActivity :
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        if (!LocalConfig.ruleHelpVersionIsLast) {
-            showRuleHelp()
-        }
     }
 
     override fun onCompatCreateOptionsMenu(menu: Menu): Boolean {
@@ -106,12 +101,6 @@ class BookSourceEditActivity :
             R.id.menu_copy_source -> sendToClip(GSON.toJson(getSource()))
             R.id.menu_paste_source -> viewModel.pasteSource { upRecyclerView(it) }
             R.id.menu_share_str -> share(GSON.toJson(getSource()))
-            R.id.menu_share_qr -> shareWithQr(
-                GSON.toJson(getSource()),
-                getString(R.string.share_book_source),
-                ErrorCorrectionLevel.L
-            )
-            R.id.menu_help -> showRuleHelp()
             R.id.menu_login -> getSource().let { source ->
                 if (checkSource(source)) {
                     viewModel.save(source) {
@@ -184,7 +173,6 @@ class BookSourceEditActivity :
         source?.let {
             binding.cbIsEnable.isChecked = it.enabled
             binding.cbIsEnableFind.isChecked = it.enabledExplore
-            binding.spType.setSelection(it.bookSourceType)
         }
         //基本信息
         sourceEntities.clear()
@@ -281,7 +269,7 @@ class BookSourceEditActivity :
         val source = viewModel.bookSource?.copy() ?: BookSource()
         source.enabled = binding.cbIsEnable.isChecked
         source.enabledExplore = binding.cbIsEnableFind.isChecked
-        source.bookSourceType = binding.spType.selectedItemPosition
+        source.bookSourceType = 0
         val searchRule = SearchRule()
         val exploreRule = ExploreRule()
         val bookInfoRule = BookInfoRule()
@@ -401,34 +389,20 @@ class BookSourceEditActivity :
 
     override fun sendText(text: String) {
         if (text == AppConst.keyboardToolChars[0]) {
-            showHelpDialog()
+            showInsertTools()
         } else {
             insertText(text)
         }
     }
 
-    private fun showHelpDialog() {
-        val items = arrayListOf("插入URL参数", "书源教程", "正则教程", "选择文件")
-        selector(getString(R.string.help), items) { _, index ->
-            when (index) {
-                0 -> insertText(AppConst.urlOption)
-                1 -> showRuleHelp()
-                2 -> showRegexHelp()
-                3 -> selectDoc.launch {
-                    mode = HandleFileContract.FILE
-                }
+    private fun showInsertTools() {
+        selector("插入工具", listOf("插入URL参数", "选择文件")) { _, index ->
+            if (index == 0) {
+                insertText(AppConst.urlOption)
+            } else {
+                selectDoc.launch { mode = HandleFileContract.FILE }
             }
         }
-    }
-
-    private fun showRuleHelp() {
-        val mdText = String(assets.open("help/ruleHelp.md").readBytes())
-        showDialogFragment(TextDialog(mdText, TextDialog.Mode.MD))
-    }
-
-    private fun showRegexHelp() {
-        val mdText = String(assets.open("help/regexHelp.md").readBytes())
-        showDialogFragment(TextDialog(mdText, TextDialog.Mode.MD))
     }
 
     private fun showKeyboardTopPopupWindow() {

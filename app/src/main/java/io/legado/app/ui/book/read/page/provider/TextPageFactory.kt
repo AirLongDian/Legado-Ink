@@ -77,7 +77,7 @@ class TextPageFactory(dataSource: DataSource) : PageFactory<TextPage>(dataSource
             }
             currentChapter?.let {
                 if (pageIndex < it.pageSize - 1) {
-                    return@with it.page(pageIndex + 1)?.removePageAloudSpan()
+                    return@with it.page(pageIndex + 1)
                         ?: TextPage(title = it.title).format()
                 }
             }
@@ -85,7 +85,7 @@ class TextPageFactory(dataSource: DataSource) : PageFactory<TextPage>(dataSource
                 return@with TextPage(text = "")
             }
             nextChapter?.let {
-                return@with it.page(0)?.removePageAloudSpan()
+                return@with it.page(0)
                     ?: TextPage(title = it.title).format()
             }
             return TextPage().format()
@@ -98,12 +98,12 @@ class TextPageFactory(dataSource: DataSource) : PageFactory<TextPage>(dataSource
             }
             if (pageIndex > 0) {
                 currentChapter?.let {
-                    return@with it.page(pageIndex - 1)?.removePageAloudSpan()
+                    return@with it.page(pageIndex - 1)
                         ?: TextPage(title = it.title).format()
                 }
             }
             prevChapter?.let {
-                return@with it.lastPage?.removePageAloudSpan()
+                return@with it.lastPage
                     ?: TextPage(title = it.title).format()
             }
             return TextPage().format()
@@ -113,15 +113,15 @@ class TextPageFactory(dataSource: DataSource) : PageFactory<TextPage>(dataSource
         get() = with(dataSource) {
             currentChapter?.let {
                 if (pageIndex < it.pageSize - 2) {
-                    return@with it.page(pageIndex + 2)?.removePageAloudSpan()
+                    return@with it.page(pageIndex + 2)
                         ?: TextPage(title = it.title).format()
                 }
                 nextChapter?.let { nc ->
                     if (pageIndex < it.pageSize - 1) {
-                        return@with nc.page(0)?.removePageAloudSpan()
+                        return@with nc.page(0)
                             ?: TextPage(title = nc.title).format()
                     }
-                    return@with nc.page(1)?.removePageAloudSpan()
+                    return@with nc.page(1)
                         ?: TextPage(title = nc.title).format()
                 }
 

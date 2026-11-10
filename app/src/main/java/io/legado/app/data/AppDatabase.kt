@@ -16,12 +16,12 @@ val appDb by lazy {
 }
 
 @Database(
-    version = 42,
+    version = 1,
     exportSchema = true,
     entities = [Book::class, BookGroup::class, BookSource::class, BookChapter::class,
         ReplaceRule::class, SearchBook::class, SearchKeyword::class, Cookie::class,
         RssSource::class, Bookmark::class, RssArticle::class, RssReadRecord::class,
-        RssStar::class, TxtTocRule::class, ReadRecord::class, HttpTTS::class, Cache::class,
+        RssStar::class, TxtTocRule::class, Cache::class,
         RuleSub::class]
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -39,8 +39,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val rssStarDao: RssStarDao
     abstract val cookieDao: CookieDao
     abstract val txtTocRuleDao: TxtTocRuleDao
-    abstract val readRecordDao: ReadRecordDao
-    abstract val httpTTSDao: HttpTTSDao
     abstract val cacheDao: CacheDao
     abstract val ruleSubDao: RuleSubDao
 
@@ -50,8 +48,6 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun createDatabase(context: Context) =
             Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
-                .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5, 6, 7, 8, 9)
-                .addMigrations(*DatabaseMigrations.migrations)
                 .allowMainThreadQueries()
                 .addCallback(dbCallback)
                 .build()
@@ -75,17 +71,11 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                 db.execSQL(
                     """insert into book_groups(groupId, groupName, 'order', show) 
-                    select ${AppConst.bookGroupAudioId}, '音频', -8, 1
-                    where not exists (select * from book_groups where groupId = ${AppConst.bookGroupAudioId})"""
-                )
-                db.execSQL(
-                    """insert into book_groups(groupId, groupName, 'order', show) 
                     select ${AppConst.bookGroupNoneId}, '未分组', -7, 1
                     where not exists (select * from book_groups where groupId = ${AppConst.bookGroupNoneId})"""
                 )
                 db.execSQL("update book_sources set loginUi = null where loginUi = 'null'")
                 db.execSQL("update rssSources set loginUi = null where loginUi = 'null'")
-                db.execSQL("update httpTTS set loginUi = null where loginUi = 'null'")
             }
         }
 

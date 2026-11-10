@@ -185,8 +185,7 @@ class SearchContentActivity :
                                 book,
                                 chapter,
                                 bookContent,
-                                chineseConvert = false,
-                                reSegment = false
+                                chineseConvert = false
                             )
                     }
                     totalContents = replaceContents?.joinToString("") ?: bookContent

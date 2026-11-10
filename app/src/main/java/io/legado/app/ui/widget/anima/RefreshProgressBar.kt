@@ -16,7 +16,6 @@ class RefreshProgressBar @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
-    private var a = 1
     private var durProgress = 0
     private var secondDurProgress = 0
     var maxProgress = 100
@@ -24,9 +23,6 @@ class RefreshProgressBar @JvmOverloads constructor(
     var bgColor = 0x00000000
     var secondColor = -0x3e3e3f
     var fontColor = -0xc9c9ca
-    var speed = 2
-    var secondFinalProgress = 0
-        private set
     private var paint: Paint = Paint()
     private val bgRect = Rect()
     private val secondRect = Rect()
@@ -35,12 +31,8 @@ class RefreshProgressBar @JvmOverloads constructor(
     var isAutoLoading: Boolean = false
         set(loading) {
             field = loading
-            if (!loading) {
-                secondDurProgress = 0
-                secondFinalProgress = 0
-            }
+            secondDurProgress = if (loading) secondMaxProgress else 0
             maxProgress = 0
-
             invalidate()
         }
 
@@ -48,14 +40,12 @@ class RefreshProgressBar @JvmOverloads constructor(
         paint.style = Paint.Style.FILL
 
         val a = context.obtainStyledAttributes(attrs, R.styleable.RefreshProgressBar)
-        speed = a.getDimensionPixelSize(R.styleable.RefreshProgressBar_speed, speed)
         maxProgress = a.getInt(R.styleable.RefreshProgressBar_max_progress, maxProgress)
         durProgress = a.getInt(R.styleable.RefreshProgressBar_dur_progress, durProgress)
         secondDurProgress = a.getDimensionPixelSize(
             R.styleable.RefreshProgressBar_second_dur_progress,
             secondDurProgress
         )
-        secondFinalProgress = secondDurProgress
         secondMaxProgress = a.getDimensionPixelSize(
             R.styleable.RefreshProgressBar_second_max_progress,
             secondMaxProgress
@@ -104,35 +94,6 @@ class RefreshProgressBar @JvmOverloads constructor(
             canvas.drawRect(fontRectF, paint)
         }
 
-        if (this.isAutoLoading) {
-            if (secondDurProgress >= secondMaxProgress) {
-                a = -1
-            } else if (secondDurProgress <= 0) {
-                a = 1
-            }
-            secondDurProgress += a * speed
-            if (secondDurProgress < 0)
-                secondDurProgress = 0
-            else if (secondDurProgress > secondMaxProgress)
-                secondDurProgress = secondMaxProgress
-            secondFinalProgress = secondDurProgress
-            invalidate()
-        } else {
-            if (secondDurProgress != secondFinalProgress) {
-                if (secondDurProgress > secondFinalProgress) {
-                    secondDurProgress -= speed
-                    if (secondDurProgress < secondFinalProgress) {
-                        secondDurProgress = secondFinalProgress
-                    }
-                } else {
-                    secondDurProgress += speed
-                    if (secondDurProgress > secondFinalProgress) {
-                        secondDurProgress = secondFinalProgress
-                    }
-                }
-                this.invalidate()
-            }
-        }
     }
 
     fun getDurProgress(): Int {
@@ -161,23 +122,6 @@ class RefreshProgressBar @JvmOverloads constructor(
 
     fun setSecondDurProgress(secondDur: Int) {
         this.secondDurProgress = secondDur
-        this.secondFinalProgress = secondDurProgress
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            this.invalidate()
-        } else {
-            this.postInvalidate()
-        }
-    }
-
-    fun setSecondDurProgressWithAnim(secondDur: Int) {
-        var secondDur1 = secondDur
-        if (secondDur1 < 0) {
-            secondDur1 = 0
-        }
-        if (secondDur1 > secondMaxProgress) {
-            secondDur1 = secondMaxProgress
-        }
-        this.secondFinalProgress = secondDur1
         if (Looper.myLooper() == Looper.getMainLooper()) {
             this.invalidate()
         } else {
@@ -188,7 +132,6 @@ class RefreshProgressBar @JvmOverloads constructor(
     fun clean() {
         durProgress = 0
         secondDurProgress = 0
-        secondFinalProgress = 0
         if (Looper.myLooper() == Looper.getMainLooper()) {
             this.invalidate()
         } else {

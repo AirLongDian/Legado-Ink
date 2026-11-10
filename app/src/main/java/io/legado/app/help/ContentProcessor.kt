@@ -60,8 +60,7 @@ class ContentProcessor private constructor(
         content: String,
         includeTitle: Boolean = true,
         useReplace: Boolean = true,
-        chineseConvert: Boolean = true,
-        reSegment: Boolean = true
+        chineseConvert: Boolean = true
     ): List<String> {
         var mContent = content
         //去除重复标题
@@ -72,10 +71,6 @@ class ContentProcessor private constructor(
             mContent = mContent.replace(titleRegex, "")
         } catch (e: Exception) {
             AppLog.put("去除重复标题出错\n${e.localizedMessage}", e)
-        }
-        if (reSegment && book.getReSegment()) {
-            //重新分段
-            mContent = ContentHelp.reSegment(mContent, chapter.title)
         }
         if (includeTitle) {
             //重新添加标题

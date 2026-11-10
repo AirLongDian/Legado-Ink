@@ -3,14 +3,11 @@ package io.legado.app.ui.rss.read
 import android.app.Application
 import android.content.Intent
 import android.net.Uri
-import android.speech.tts.TextToSpeech
-import android.speech.tts.UtteranceProgressListener
 import android.util.Base64
 import android.webkit.URLUtil
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import io.legado.app.R
 import io.legado.app.base.BaseViewModel
 import io.legado.app.constant.AppConst
 import io.legado.app.data.appDb
@@ -27,17 +24,13 @@ import java.io.File
 import java.util.*
 
 
-class ReadRssViewModel(application: Application) : BaseViewModel(application),
-    TextToSpeech.OnInitListener {
+class ReadRssViewModel(application: Application) : BaseViewModel(application) {
     var callBack: CallBack? = null
     var rssSource: RssSource? = null
     var rssArticle: RssArticle? = null
     val contentLiveData = MutableLiveData<String>()
     val urlLiveData = MutableLiveData<AnalyzeUrl>()
     var rssStar: RssStar? = null
-    var textToSpeech: TextToSpeech? = null
-    private var ttsInitFinish = false
-    private var ttsTextList = arrayListOf<String>()
 
     fun initData(intent: Intent) {
         execute {
@@ -191,64 +184,7 @@ class ReadRssViewModel(application: Application) : BaseViewModel(application),
         }
     }
 
-    @Synchronized
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            textToSpeech?.language = Locale.CHINA
-            textToSpeech?.setOnUtteranceProgressListener(TTSUtteranceListener())
-            ttsInitFinish = true
-            play()
-        } else {
-            context.toastOnUi(R.string.tts_init_failed)
-        }
-    }
-
-    @Synchronized
-    private fun play() {
-        if (!ttsInitFinish) return
-        textToSpeech?.stop()
-        ttsTextList.forEach {
-            textToSpeech?.speak(it, TextToSpeech.QUEUE_ADD, null, "rss")
-        }
-    }
-
-    fun readAloud(textArray: Array<String>) {
-        ttsTextList.clear()
-        ttsTextList.addAll(textArray)
-        textToSpeech?.let {
-            play()
-        } ?: let {
-            textToSpeech = TextToSpeech(context, this)
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        textToSpeech?.stop()
-        textToSpeech?.shutdown()
-    }
-
-    /**
-     * 朗读监听
-     */
-    private inner class TTSUtteranceListener : UtteranceProgressListener() {
-
-        override fun onStart(s: String) {
-            callBack?.upTtsMenu(true)
-        }
-
-        override fun onDone(s: String) {
-            callBack?.upTtsMenu(false)
-        }
-
-        override fun onError(s: String) {
-
-        }
-
-    }
-
     interface CallBack {
         fun upStarMenu()
-        fun upTtsMenu(isPlaying: Boolean)
     }
 }

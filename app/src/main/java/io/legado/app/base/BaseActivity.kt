@@ -67,6 +67,8 @@ abstract class BaseActivity<VB : ViewBinding>(
         window.decorView.disableAutoFill()
         initTheme()
         super.onCreate(savedInstanceState)
+        @Suppress("DEPRECATION")
+        overridePendingTransition(0, 0)
         setContentView(binding.root)
         setupSystemBar()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -115,7 +117,7 @@ abstract class BaseActivity<VB : ViewBinding>(
 
     final override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            supportFinishAfterTransition()
+            finish()
             return true
         }
         return onCompatOptionsItemSelected(item)
@@ -124,35 +126,11 @@ abstract class BaseActivity<VB : ViewBinding>(
     open fun onCompatOptionsItemSelected(item: MenuItem) = super.onOptionsItemSelected(item)
 
     private fun initTheme() {
-        when (theme) {
-            Theme.Transparent -> setTheme(R.style.AppTheme_Transparent)
-            Theme.Dark -> {
-                setTheme(R.style.AppTheme_Dark)
-                window.decorView.applyBackgroundTint(backgroundColor)
-            }
-            Theme.Light -> {
-                setTheme(R.style.AppTheme_Light)
-                window.decorView.applyBackgroundTint(backgroundColor)
-            }
-            else -> {
-                if (ColorUtils.isColorLight(primaryColor)) {
-                    setTheme(R.style.AppTheme_Light)
-                } else {
-                    setTheme(R.style.AppTheme_Dark)
-                }
-                window.decorView.applyBackgroundTint(backgroundColor)
-            }
-        }
-        if (imageBg) {
-            try {
-                ThemeConfig.getBgImage(this, windowSize)?.let {
-                    window.decorView.background = BitmapDrawable(resources, it)
-                }
-            } catch (e: OutOfMemoryError) {
-                toastOnUi("背景图片太大,内存溢出")
-            } catch (e: Exception) {
-                AppLog.put("加载背景出错\n${e.localizedMessage}", e)
-            }
+        if (theme == Theme.Transparent) {
+            setTheme(R.style.AppTheme_Transparent)
+        } else {
+            setTheme(R.style.AppTheme_EInk)
+            window.decorView.applyBackgroundTint(backgroundColor)
         }
     }
 
@@ -165,7 +143,7 @@ abstract class BaseActivity<VB : ViewBinding>(
         setStatusBarColorAuto(statusBarColor, isTransparentStatusBar, fullScreen)
         if (toolBarTheme == Theme.Dark) {
             setLightStatusBar(false)
-        } else if (toolBarTheme == Theme.Light) {
+        } else if (toolBarTheme == Theme.Light || toolBarTheme == Theme.EInk) {
             setLightStatusBar(true)
         }
         upNavigationBarColor()
@@ -186,5 +164,7 @@ abstract class BaseActivity<VB : ViewBinding>(
     override fun finish() {
         currentFocus?.hideSoftInput()
         super.finish()
+        @Suppress("DEPRECATION")
+        overridePendingTransition(0, 0)
     }
 }

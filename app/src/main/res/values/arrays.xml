@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string-array name="book_type">
-		<item>Text</item>
-		<item>Audio</item>
-	</string-array>
 
 	<string-array name="group_style">
 		<item>Tab</item>
@@ -30,13 +26,6 @@
 		<item>@string/jf_convert_f</item>
 	</string-array>
 
-	<string-array name="theme_mode">
-		<item>Follow system</item>
-		<item>Bright mode</item>
-		<item>Dark mode</item>
-		<item>E-Ink mode</item>
-	</string-array>
-
 	<string-array name="NavBarColors">
 		<item>Auto</item>
 		<item>Black</item>
@@ -59,15 +48,6 @@
 		<item>@string/screen_sensor</item>
 	</string-array>
 
-	<string-array name="icon_names">
-		<item>iconMain</item>
-		<item>icon1</item>
-		<item>icon2</item>
-		<item>icon3</item>
-		<item>icon4</item>
-		<item>icon5</item>
-		<item>icon6</item>
-	</string-array>
 
 	<string-array name="chinese_mode">
 		<item>Off</item>

@@ -135,14 +135,8 @@ class BookSourceDebugActivity : VMBaseActivity<ActivitySourceDebugBinding, BookS
             R.id.menu_book_src -> showDialogFragment(TextDialog(viewModel.bookSrc))
             R.id.menu_toc_src -> showDialogFragment(TextDialog(viewModel.tocSrc))
             R.id.menu_content_src -> showDialogFragment(TextDialog(viewModel.contentSrc))
-            R.id.menu_help -> showHelp()
         }
         return super.onCompatOptionsItemSelected(item)
-    }
-
-    private fun showHelp() {
-        val text = String(assets.open("help/debugHelp.md").readBytes())
-        showDialogFragment(TextDialog(text, TextDialog.Mode.MD))
     }
 
 }

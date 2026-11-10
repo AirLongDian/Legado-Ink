@@ -21,7 +21,6 @@ import io.legado.app.help.BookHelp
 import io.legado.app.lib.dialogs.alert
 import io.legado.app.lib.theme.primaryColor
 import io.legado.app.receiver.SharedReceiverActivity
-import io.legado.app.service.WebService
 import io.legado.app.ui.main.MainActivity
 import io.legado.app.ui.widget.number.NumberPickerDialog
 import io.legado.app.utils.*
@@ -36,7 +35,6 @@ class OtherConfigFragment : BasePreferenceFragment(),
         appCtx,
         SharedReceiverActivity::class.java.name
     )
-    private val webPort get() = getPrefInt(PreferKey.webPort, 1122)
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         putPrefBoolean(PreferKey.processText, isProcessTextEnabled())
@@ -44,7 +42,6 @@ class OtherConfigFragment : BasePreferenceFragment(),
         upPreferenceSummary(PreferKey.userAgent, AppConfig.userAgent)
         upPreferenceSummary(PreferKey.preDownloadNum, AppConfig.preDownloadNum.toString())
         upPreferenceSummary(PreferKey.threadCount, AppConfig.threadCount.toString())
-        upPreferenceSummary(PreferKey.webPort, webPort.toString())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -78,14 +75,6 @@ class OtherConfigFragment : BasePreferenceFragment(),
                 .show {
                     AppConfig.threadCount = it
                 }
-            PreferKey.webPort -> NumberPickerDialog(requireContext())
-                .setTitle(getString(R.string.web_port_title))
-                .setMaxValue(60000)
-                .setMinValue(1024)
-                .setValue(webPort)
-                .show {
-                    putPrefInt(PreferKey.webPort, it)
-                }
             PreferKey.cleanCache -> clearCache()
             "uploadRule" -> DirectLinkUploadConfig().show(childFragmentManager, "uploadRuleConfig")
         }
@@ -100,13 +89,6 @@ class OtherConfigFragment : BasePreferenceFragment(),
             PreferKey.threadCount -> {
                 upPreferenceSummary(key, AppConfig.threadCount.toString())
                 postEvent(PreferKey.threadCount, "")
-            }
-            PreferKey.webPort -> {
-                upPreferenceSummary(key, webPort.toString())
-                if (WebService.isRun) {
-                    WebService.stop(requireContext())
-                    WebService.start(requireContext())
-                }
             }
             PreferKey.recordLog -> LogUtils.upLevel()
             PreferKey.processText -> sharedPreferences?.let {
@@ -132,7 +114,6 @@ class OtherConfigFragment : BasePreferenceFragment(),
             PreferKey.preDownloadNum -> preference.summary =
                 getString(R.string.pre_download_s, value)
             PreferKey.threadCount -> preference.summary = getString(R.string.threads_num, value)
-            PreferKey.webPort -> preference.summary = getString(R.string.web_port_summary, value)
             else -> if (preference is ListPreference) {
                 val index = preference.findIndexOfValue(value)
                 // Set the summary to reflect the new value.
